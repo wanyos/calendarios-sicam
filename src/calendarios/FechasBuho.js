@@ -37,7 +37,7 @@ function getPos(grupo){
 const subgrupos = [
     [new Date(2022,1,16), new Date(2022,0,3), new Date(2022,1,7), new Date(2022,2,14), new Date(2022,1,1), new Date(2022,0,2), new Date(2022,1,6), new Date(2022,0,12)],
     [new Date(2022,1,9), new Date(2022,2,16), new Date(2022,0,31), new Date(2022,2,7), new Date(2022,0,25), new Date(2022,2,1), new Date(2022,0,30), new Date(2022,0,5)],
-    [new Date(2022,0,2), new Date(2022,2,9), new Date(2022,0,24), new Date(2022,1,28), new Date(2022,0,18), new Date(2022,1,22), new Date(2022,0,23), new Date(2022,1,27)],
+    [new Date(2022,1,2), new Date(2022,2,9), new Date(2022,0,24), new Date(2022,1,28), new Date(2022,0,18), new Date(2022,1,22), new Date(2022,0,23), new Date(2022,1,27)],
     [new Date(2022,0,26), new Date(2022,2,2), new Date(2022,0,17), new Date(2022,1,21), new Date(2022,0,11), new Date(2022,1,15), new Date(2022,0,16), new Date(2022,1,20)],
     [new Date(2022,0,19), new Date(2022,1,23), new Date(2022,0,10), new Date(2022,1,14), new Date(2022,0,4), new Date(2022,1,8), new Date(2022,0,9), new Date(2022,1,13)]
 ];
