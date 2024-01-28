@@ -24,9 +24,9 @@ export function getDatosListaLibres(tipoCalendario, year, grupo, grupoDos){
         return getListaLibresGruaDSM(year, grupo);
     } else if(tipoCalendario === 'GruaDM_Noche'){
         return getListaLibresGruaDSMNoche(year, grupo);
-    } else if(tipoCalendario === 'ParkingDSM_100'){
+    } else if(tipoCalendario === 'ParkingDM_100'){
         return getListaLibresParkingDSM100(year, grupo);
-    } else if(tipoCalendario === 'ParkingDSM_50'){
+    } else if(tipoCalendario === 'ParkingDM_50'){
         return getListaLibresParkingDSM50(year, grupo);
     } else if(tipoCalendario === 'Refuerzo_Nocturno'){
        return getListaLibresRefuerzoNocturno(year, grupo, grupoDos);
@@ -46,7 +46,7 @@ export function getDatosListaSubgrupo(tipoCalendario, year, grupo, subgrupo){
         return getListaSubgrupoGrua(year, grupo, subgrupo);
     } else if(tipoCalendario === 'GruaDM'){
         return getListaSubgrupoGruaDSM(year, subgrupo); //el subgrupo es número
-    } else if(tipoCalendario === 'ParkingDSM_50'){
+    } else if(tipoCalendario === 'ParkingDM_50'){
         return getListaReduccionParkingDSM50(year, grupo);  //solo existe un tipo de subgrupo por grupo
     } else if(tipoCalendario === 'Buho'){
         return getListaSubgrupoBuho(year, grupo, subgrupo);
@@ -61,9 +61,9 @@ export function getDatosListaSubComunes(tipoCalendario, year, grupo, subgrupo){
         return getListaSubComunesInspector(year, grupo, subgrupo);
     } else if(tipoCalendario === 'Inspector_Noche'){
         return getListaSubComunesInspectorNoche(year, grupo, subgrupo);
-    } else if(tipoCalendario === 'ParkingDSM_100'){
+    } else if(tipoCalendario === 'ParkingDM_100'){
         return getListaSubgrupoParkingDSM100(year, grupo);  //solo existe un tipo de subgrupo por grupo
-    }   else if(tipoCalendario === 'ParkingDSM_50'){
+    }   else if(tipoCalendario === 'ParkingDM_50'){
         return getListaSubgrupoParkingDSM50(year, grupo);  //se le llama dia parcial
     } else if (tipoCalendario === 'Buho'){
         return getListaSubComunesBuho(year, grupo, subgrupo);

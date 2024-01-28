@@ -12,9 +12,9 @@ export function initSelectGrupo(tipoCalendario, select) {
         arrayGrupo = [1, 2, 3, 4, 5];
     } else if (tipoCalendario === 'GruaDM_Noche') {
         arrayGrupo = [1,2,3];
-    } else if(tipoCalendario === 'ParkingDSM_100'){
+    } else if(tipoCalendario === 'ParkingDM_100'){
         arrayGrupo = [1,2,3,4,5,6,7,8,9,10];
-    } else if(tipoCalendario === 'ParkingDSM_50'){
+    } else if(tipoCalendario === 'ParkingDM_50'){
         arrayGrupo = [1,2,3,4,5,6,7,8,9,10,11,12];
     } else if(tipoCalendario === 'Refuerzo_Nocturno'){
         arrayGrupo = ["A", "B"];
@@ -39,7 +39,7 @@ export function initSelectSubgrupo(tipoCalendario, select, select_value) {
         array = ['A', 'B', 'C'];
     } else if (tipoCalendario === 'GruaDM') {
         array = getArrayGruaDSM(select_value);
-    } else if(tipoCalendario === 'GruaDM_Noche' || tipoCalendario === 'ParkingDSM_100' || tipoCalendario === 'ParkingDSM_50' || tipoCalendario === 'Refuerzo_Nocturno'){
+    } else if(tipoCalendario === 'GruaDM_Noche' || tipoCalendario === 'ParkingDM_100' || tipoCalendario === 'ParkingDM_50' || tipoCalendario === 'Refuerzo_Nocturno'){
         return;
     }
     setDatosSelect(select, array);
@@ -78,20 +78,20 @@ export function initRotulos(tipoCalendario, div) {
         sub1.style.display = "none";
         sub2.style.display = "none";
         
-    } else if(tipoCalendario === 'ParkingDSM_100'){
+    } else if(tipoCalendario === 'ParkingDM_100'){
         //eliminar subgrupo y uno de los de reduccion
         subgrupo.style.display = "none";
-        sub1.style.display = "none";
-        sub2.style.display = "block";
-        sub2.textContent = 'D.Reducción';
+        sub1.style.display = "block";
+        sub2.style.display = "none";
+        sub1.textContent = 'D.Reducción';
 
-    } else if(tipoCalendario === 'ParkingDSM_50'){
+    } else if(tipoCalendario === 'ParkingDM_50'){
         //eliminar uno de reduccion cambiar nombres etiquetas
         subgrupo.style.display = "block";
-        sub1.style.display = "none";
-        sub2.style.display = "block";
+        sub1.style.display = "block";
+        sub2.style.display = "none";
         subgrupo.textContent = 'Jda.Parcial';
-        sub2.textContent = 'D.Reducción';
+        sub1.textContent = 'D.Reducción';
 
     } else if(tipoCalendario === 'Refuerzo_Nocturno'){
         //eliminar etiquetas reduccion y subgrupo
@@ -107,7 +107,7 @@ export function initDivNavSup(tipoCalendario, divNavSup){
     let select_subgrupo = ultimo. previousElementSibling;
     let label_subgrupo = select_subgrupo.previousElementSibling;
 
-    if(tipoCalendario === 'GruaDM_Noche' || tipoCalendario === 'ParkingDSM_100' || tipoCalendario === 'ParkingDSM_50' || tipoCalendario === 'Refuerzo_Nocturno'){
+    if(tipoCalendario === 'GruaDM_Noche' || tipoCalendario === 'ParkingDM_100' || tipoCalendario === 'ParkingDM_50' || tipoCalendario === 'Refuerzo_Nocturno'){
         select_subgrupo.style.display = "none";
         label_subgrupo.style.display = "none";
     } else {
