@@ -10,7 +10,7 @@ export function initSelectGrupo(tipoCalendario, select) {
     if (tipoCalendario === 'Conductor' || tipoCalendario === 'Inspector' || tipoCalendario === 'Inspector_Noche' ||
         tipoCalendario === 'Grua' || tipoCalendario === 'GruaDM' || tipoCalendario === 'Buho') {
         arrayGrupo = [1, 2, 3, 4, 5];
-    } else if (tipoCalendario === 'GruaDSM_Noche') {
+    } else if (tipoCalendario === 'GruaDM_Noche') {
         arrayGrupo = [1,2,3];
     } else if(tipoCalendario === 'ParkingDSM_100'){
         arrayGrupo = [1,2,3,4,5,6,7,8,9,10];
@@ -39,7 +39,7 @@ export function initSelectSubgrupo(tipoCalendario, select, select_value) {
         array = ['A', 'B', 'C'];
     } else if (tipoCalendario === 'GruaDM') {
         array = getArrayGruaDSM(select_value);
-    } else if(tipoCalendario === 'GruaDSM_Noche' || tipoCalendario === 'ParkingDSM_100' || tipoCalendario === 'ParkingDSM_50' || tipoCalendario === 'Refuerzo_Nocturno'){
+    } else if(tipoCalendario === 'GruaDM_Noche' || tipoCalendario === 'ParkingDSM_100' || tipoCalendario === 'ParkingDSM_50' || tipoCalendario === 'Refuerzo_Nocturno'){
         return;
     }
     setDatosSelect(select, array);
@@ -72,7 +72,7 @@ export function initRotulos(tipoCalendario, div) {
         sub1.style.display = "none";
         sub2.style.display = "none";
 
-    } else if(tipoCalendario === 'GruaDSM_Noche'){
+    } else if(tipoCalendario === 'GruaDM_Noche'){
         //eliminar etiquetas reduccion y subgrupo
         subgrupo.style.display = "none";
         sub1.style.display = "none";
@@ -107,7 +107,7 @@ export function initDivNavSup(tipoCalendario, divNavSup){
     let select_subgrupo = ultimo. previousElementSibling;
     let label_subgrupo = select_subgrupo.previousElementSibling;
 
-    if(tipoCalendario === 'GruaDSM_Noche' || tipoCalendario === 'ParkingDSM_100' || tipoCalendario === 'ParkingDSM_50' || tipoCalendario === 'Refuerzo_Nocturno'){
+    if(tipoCalendario === 'GruaDM_Noche' || tipoCalendario === 'ParkingDSM_100' || tipoCalendario === 'ParkingDSM_50' || tipoCalendario === 'Refuerzo_Nocturno'){
         select_subgrupo.style.display = "none";
         label_subgrupo.style.display = "none";
     } else {

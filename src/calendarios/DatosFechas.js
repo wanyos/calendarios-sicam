@@ -22,7 +22,7 @@ export function getDatosListaLibres(tipoCalendario, year, grupo, grupoDos){
         return getListaLibresGrua(year, grupo);
     } else if(tipoCalendario === 'GruaDM'){
         return getListaLibresGruaDSM(year, grupo);
-    } else if(tipoCalendario === 'GruaDSM_Noche'){
+    } else if(tipoCalendario === 'GruaDM_Noche'){
         return getListaLibresGruaDSMNoche(year, grupo);
     } else if(tipoCalendario === 'ParkingDSM_100'){
         return getListaLibresParkingDSM100(year, grupo);
