@@ -268,7 +268,7 @@ select_year.value = new Date().getFullYear();
 btn.addEventListener('click', nuevaFecha);
 select_opcion.addEventListener('change', initCalendario);
 select_grupo.addEventListener('change', () => {
-    if (select_opcion.value === 'GruaDSM') {
+    if (select_opcion.value === 'GruaDM') {
         initSelectSubgrupo(select_opcion.value, select_subgrupo, select_grupo.value);
     }
 });

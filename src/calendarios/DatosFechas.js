@@ -20,7 +20,7 @@ export function getDatosListaLibres(tipoCalendario, year, grupo, grupoDos){
         return getListaLibresInspectorNoche(year, grupo);
     } else if(tipoCalendario === 'Grua'){
         return getListaLibresGrua(year, grupo);
-    } else if(tipoCalendario === 'GruaDSM'){
+    } else if(tipoCalendario === 'GruaDM'){
         return getListaLibresGruaDSM(year, grupo);
     } else if(tipoCalendario === 'GruaDSM_Noche'){
         return getListaLibresGruaDSMNoche(year, grupo);
@@ -44,7 +44,7 @@ export function getDatosListaSubgrupo(tipoCalendario, year, grupo, subgrupo){
         return getListaSubgrupoInspectorNoche(year, grupo, subgrupo);
     } else if(tipoCalendario === 'Grua'){
         return getListaSubgrupoGrua(year, grupo, subgrupo);
-    } else if(tipoCalendario === 'GruaDSM'){
+    } else if(tipoCalendario === 'GruaDM'){
         return getListaSubgrupoGruaDSM(year, subgrupo); //el subgrupo es número
     } else if(tipoCalendario === 'ParkingDSM_50'){
         return getListaReduccionParkingDSM50(year, grupo);  //solo existe un tipo de subgrupo por grupo

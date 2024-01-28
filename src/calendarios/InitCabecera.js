@@ -8,7 +8,7 @@
 export function initSelectGrupo(tipoCalendario, select) {
     let arrayGrupo;
     if (tipoCalendario === 'Conductor' || tipoCalendario === 'Inspector' || tipoCalendario === 'Inspector_Noche' ||
-        tipoCalendario === 'Grua' || tipoCalendario === 'GruaDSM' || tipoCalendario === 'Buho') {
+        tipoCalendario === 'Grua' || tipoCalendario === 'GruaDM' || tipoCalendario === 'Buho') {
         arrayGrupo = [1, 2, 3, 4, 5];
     } else if (tipoCalendario === 'GruaDSM_Noche') {
         arrayGrupo = [1,2,3];
@@ -37,7 +37,7 @@ export function initSelectSubgrupo(tipoCalendario, select, select_value) {
         array = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
     } else if (tipoCalendario === 'Grua') {
         array = ['A', 'B', 'C'];
-    } else if (tipoCalendario === 'GruaDSM') {
+    } else if (tipoCalendario === 'GruaDM') {
         array = getArrayGruaDSM(select_value);
     } else if(tipoCalendario === 'GruaDSM_Noche' || tipoCalendario === 'ParkingDSM_100' || tipoCalendario === 'ParkingDSM_50' || tipoCalendario === 'Refuerzo_Nocturno'){
         return;
@@ -66,7 +66,7 @@ export function initRotulos(tipoCalendario, div) {
         sub1.textContent = 'Grupo(A/C/E/G/I)';
         sub2.textContent = 'Grupo(B/D/F/H/J)';
 
-    } else if(tipoCalendario === 'Grua' || tipoCalendario === 'GruaDSM'){
+    } else if(tipoCalendario === 'Grua' || tipoCalendario === 'GruaDM'){
         //eliminar etiquetas dias reduccion
         subgrupo.style.display = "block";
         sub1.style.display = "none";
@@ -130,8 +130,6 @@ export function initCajaRefuerzo(tipoCalendario, divNavSup, divRefuerzo){
      label_subgrupo.style.display = "block";
    }
 }
-
-
 
 
 function setDatosSelect(select, array) {
