@@ -1,6 +1,13 @@
 import { defineConfig } from 'vite'
 
 export default defineConfig({
+  // WHY: rutas relativas en el HTML generado (./assets/...) en lugar
+  // de absolutas (/assets/...). Permite servir el build desde cualquier
+  // ubicación: Live Server abriendo /build/index.html, file:// directo,
+  // raíz de un dominio o un subpath. Esta app no usa router, así que
+  // no hay caso donde las rutas absolutas sean preferibles.
+  base: './',
+
   // WHY: index.html vive en src/ junto al resto del código (estilo.css,
   // img/, calendarios/). Mantenemos esa estructura en lugar de mover
   // archivos solo para seguir la convención Vite por defecto.
