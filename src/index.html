@@ -6,115 +6,122 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <meta name="google" value="notranslate"/>
+
+    <!-- WHY: Dosis (titulares) + Catamaran (cuerpo) son las Google Fonts que usa sicamemt.org
+         como sustitutas open-source de su DinPro propietaria. preconnect acelera la carga. -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Catamaran:wght@400;500;600;700&family=Dosis:wght@500;600;700;800&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="./estilo.css"/>
-    <title>Calendarios</title>
+    <title>Calendarios · SICAM</title>
   </head>
 
   <body translate="no">
 
-    <header class="header">
-      <h2 id="titulo"></h2>
+    <header class="hero">
+      <div class="hero__inner">
+        <img class="hero__logo" src="./img/logo-sicam.png" alt="SICAM Madrid"/>
+        <div class="hero__text">
+          <span class="hero__eyebrow">Sindicato de Conductores · EMT Madrid</span>
+          <h2 id="titulo" class="hero__title"></h2>
+        </div>
+      </div>
     </header>
 
-    <nav>
-      
-      <div class="div-central-select">
-           
-        <div id="nav_sup" class="nav__sup">
-            <label>Año</label>
-            <select name="cbo_grupo" id="select_year">
-              <option value="2022">2022</option>
-              <option value="2023">2023</option>
-              <option value="2024">2024</option>
-              <option value="2025">2025</option>
-              <option value="2026">2026</option>
-              <option value="2027">2027</option>
-              <option value="2028">2028</option>
-              <option value="2029">2029</option>
-              <option value="2030">2030</option>
-            </select>
-    
-            <label for="cbo_grupo">Grupo</label>
-            <select name="cbo_grupo" id="select_grupo"></select>
-    
-            <label for="cbo_subgrupo">Subgrupo</label>
-            <select name="cbo_subgrupo" id="select_subgrupo"></select>
-    
-            <div id="opcion-refuerzo" class="opcion-refuerzo">
-                <div class="select-num">
-                  <input class="radio" id="rdNum" type="radio" value="Num" name="opcion" checked/>
-                  <label for="select-num">Num</label>
-                  <select name="select-num" id="select-num">
-                    <option value="1">1</option>
-                    <option value="2">2</option>
-                    <option value="3">3</option>
-                    <option value="4">4</option>
-                    <option value="5">5</option>
-                    <option value="6">6</option>
-                    <option value="7">7</option>
-                    <option value="8">8</option>
-                    <option value="9">9</option>
-                  </select>
-                </div>
-        
-                <div class="select-ltr">
-                  <input class="radio" id="rdLtr" type="radio" value="Ltr" name="opcion" />
-                  <label for="select-ltr">Ltr</label>
-                  <select name="select-ltr" id="select-ltr">
-                    <option value="A">A</option>
-                    <option value="B">B</option>
-                    <option value="C">C</option>
-                    <option value="D">D</option>
-                    <option value="E">E</option>
-                    <option value="F">F</option>
-                    <option value="G">G</option>
-                    <option value="H">H</option>
-                    <option value="I">I</option>
-                    <option value="J">J</option>
-                    <option value="K">K</option>
-                  </select>
-                </div>
-              </div>
-        </div>
+    <nav class="toolbar">
+      <div class="toolbar__inner">
 
-        <button class="btn" type="submit" name="btn" id="btn">Buscar</button>  
-           
-        <select id="select_opcion" class="select-opcion">
+        <!-- WHY: select_opcion (categoría) es el filtro principal — primero a la izquierda. -->
+        <select id="select_opcion" class="select select--primary">
           <option value="Conductor">Conductor</option>
           <option value="Inspector">Inspector</option>
-          <option value="Inspector_Noche">Inspector_Noche</option>
-          <option value="Grua">Grua_Asistencia</option>
-          <option value="GruaDSM">GruaDSM</option>
-          <option value="GruaDSM_Noche">GruaDSM_Noche</option>
-          <option value="ParkingDSM_100">ParkingDSM_100%</option>
-          <option value="ParkingDSM_50">ParkingDSM_50%</option>
-          <option value="Refuerzo_Nocturno">Refuerzo_Nocturno</option>
+          <option value="Inspector_Noche">Inspector Noche</option>
+          <option value="Grua">Grua Asistencia</option>
+          <option value="GruaDSM">Grua DSM</option>
+          <option value="GruaDSM_Noche">Grua DSM Noche</option>
+          <option value="ParkingDSM_100">Parking DSM 100%</option>
+          <option value="ParkingDSM_50">Parking DSM 50%</option>
+          <option value="Refuerzo_Nocturno">Refuerzo Nocturno</option>
           <option value="Buho">Buho</option>
         </select>
 
-    </div>
+        <div id="nav_sup" class="nav__sup">
+          <div class="field">
+            <label for="select_year">Año</label>
+            <!-- WHY: las <option> se generan en JS (ventana deslizante -2/+10
+                 desde el año en curso). Si las hardcodeamos aquí, el select
+                 se queda obsoleto cada año natural. -->
+            <select id="select_year" class="select"></select>
+          </div>
 
+          <div class="field">
+            <label for="select_grupo">Grupo</label>
+            <select id="select_grupo" class="select"></select>
+          </div>
+
+          <div class="field">
+            <label for="select_subgrupo">Subgrupo</label>
+            <select id="select_subgrupo" class="select"></select>
+          </div>
+
+          <div id="opcion-refuerzo" class="opcion-refuerzo">
+            <div class="field field--radio">
+              <input class="radio" id="rdNum" type="radio" value="Num" name="opcion" checked/>
+              <label for="select-num">Num</label>
+              <select name="select-num" id="select-num" class="select">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+              </select>
+            </div>
+
+            <div class="field field--radio">
+              <input class="radio" id="rdLtr" type="radio" value="Ltr" name="opcion"/>
+              <label for="select-ltr">Ltr</label>
+              <select name="select-ltr" id="select-ltr" class="select">
+                <option value="A">A</option>
+                <option value="B">B</option>
+                <option value="C">C</option>
+                <option value="D">D</option>
+                <option value="E">E</option>
+                <option value="F">F</option>
+                <option value="G">G</option>
+                <option value="H">H</option>
+                <option value="I">I</option>
+                <option value="J">J</option>
+                <option value="K">K</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn" type="submit" name="btn" id="btn">Buscar</button>
+
+      </div>
     </nav>
 
-    <main>
-      <div class="container">
-      <aside class="aside">
-
-        <img src="./img/logo-sicam.png" alt="logo">
-      
-        <div id="rotulos-subgrupo" class="rotulos">
-          <h4 class="libres">Libre</h4>
-          <h4 class="subgrupo">Subgrupo</h4>
-          <h4 class="sub1">Grupo(A/C/E/G)</h4>
-          <h4 class="sub2">Grupo(B/D/F/H)</h4>
-        </div>
-      </aside>
-        <div class="container-tabla" id="container-tabla"></div>
+    <main class="main">
+      <!-- WHY: la leyenda pasa de aside vertical a chips horizontales — fija el descentrado
+           y deja todo el ancho del main para la grid de cards de meses. -->
+      <div id="rotulos-subgrupo" class="rotulos">
+        <h4 class="libres">Libre</h4>
+        <h4 class="subgrupo">Subgrupo</h4>
+        <h4 class="sub1">Grupo(A/C/E/G)</h4>
+        <h4 class="sub2">Grupo(B/D/F/H)</h4>
       </div>
+
+      <div id="container-tabla" class="container-tabla"></div>
     </main>
 
-    <footer>
-      <h4>Copyright &COPY; Sicam  EMT</h4>
+    <footer class="footer">
+      <p>© Sicam EMT · Madrid</p>
     </footer>
 
     <script type="module" src="./index.js"></script>

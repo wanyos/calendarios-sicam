@@ -102,33 +102,30 @@ export function initRotulos(tipoCalendario, div) {
 }
 
 
-export function initDivNavSup(tipoCalendario, divNavSup){
-    let ultimo = divNavSup.lastElementChild;
-    let select_subgrupo = ultimo. previousElementSibling;
-    let label_subgrupo = select_subgrupo.previousElementSibling;
+// WHY: tras el rediseño, label y select del subgrupo viven dentro de un .field;
+//      ya no son hermanos sueltos en nav__sup. Basta con ocultar/mostrar el
+//      .field entero. Usamos display:"" (no "block") para que al restaurar se
+//      recupere el flex propio del .field, no un block que rompería el layout.
+function getFieldSubgrupo(divNavSup) {
+    // estructura: [field año][field grupo][field subgrupo][div opcion-refuerzo]
+    return divNavSup.lastElementChild.previousElementSibling;
+}
 
-    if(tipoCalendario === 'GruaDSM_Noche' || tipoCalendario === 'ParkingDSM_100' || tipoCalendario === 'ParkingDSM_50' || tipoCalendario === 'Refuerzo_Nocturno'){
-        select_subgrupo.style.display = "none";
-        label_subgrupo.style.display = "none";
-    } else {
-        select_subgrupo.style.display = "block";
-        label_subgrupo.style.display = "block";
-    }
+export function initDivNavSup(tipoCalendario, divNavSup){
+    const fieldSubgrupo = getFieldSubgrupo(divNavSup);
+    const ocultar = ['GruaDSM_Noche', 'ParkingDSM_100', 'ParkingDSM_50', 'Refuerzo_Nocturno'].includes(tipoCalendario);
+    fieldSubgrupo.style.display = ocultar ? 'none' : '';
 }
 
 export function initCajaRefuerzo(tipoCalendario, divNavSup, divRefuerzo){
-    let ultimo = divNavSup.lastElementChild;
-    let select_subgrupo = ultimo. previousElementSibling;
-    let label_subgrupo = select_subgrupo.previousElementSibling;
-   if(tipoCalendario === 'Refuerzo_Nocturno'){
-     divRefuerzo.style.display = "flex";
-     select_subgrupo.style.display = "none";
-     label_subgrupo.style.display = "none";
-   } else {
-     divRefuerzo.style.display = "none";
-     select_subgrupo.style.display = "block";
-     label_subgrupo.style.display = "block";
-   }
+    const fieldSubgrupo = getFieldSubgrupo(divNavSup);
+    if (tipoCalendario === 'Refuerzo_Nocturno') {
+        divRefuerzo.style.display = 'flex';
+        fieldSubgrupo.style.display = 'none';
+    } else {
+        divRefuerzo.style.display = 'none';
+        fieldSubgrupo.style.display = '';
+    }
 }
 
 
@@ -141,6 +138,17 @@ function setDatosSelect(select, array) {
         op.value = array[a];
         op.text = array[a];
         select.appendChild(op);
+    }
+    // WHY: tras manipular las <option> nativas, Tom Select no se entera por sí
+    //      solo. clearOptions+addOptions+setValue rebuilen su dropdown y dejan
+    //      seleccionado el primer elemento (replica del comportamiento nativo:
+    //      tras añadir options, select.value apunta al primero por defecto).
+    if (select.tomselect) {
+        const ts = select.tomselect;
+        ts.clearOptions();
+        ts.addOptions(array.map(v => ({ value: String(v), text: String(v) })));
+        if (array.length > 0) ts.setValue(String(array[0]), true);
+        ts.refreshOptions(false);
     }
 }
 

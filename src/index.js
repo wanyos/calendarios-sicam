@@ -1,4 +1,10 @@
 
+import TomSelect from 'tom-select';
+// WHY: tom-select.default.css incluye el TEMA con chevron, padding-right
+//      reservado vía --ts-pr-caret, hover y active states. tom-select.css
+//      es solo el core sin tema y obliga a recrearlo todo a mano.
+import 'tom-select/dist/css/tom-select.default.css';
+
 import { getDatosListaLibres, getDatosListaSubgrupo, getDatosListaSubComunes } from './calendarios/DatosFechas.js';
 import { initSelectGrupo, initSelectSubgrupo, initRotulos, initDivNavSup, initCajaRefuerzo } from './calendarios/InitCabecera.js';
 
@@ -238,7 +244,12 @@ function getGrupoDos(){
 
 
 function initCalendario() {
-    titulo.textContent = `Calendario ${select_opcion.value}`;
+    // WHY: usamos el .text del <option> seleccionada (no el .value) porque el
+    //      value es un id interno con guiones bajos ("Inspector_Noche") y a
+    //      veces sin separar ("GruaDSM"); el text del <option> ya está en
+    //      formato legible. Así el HTML queda como única fuente de verdad
+    //      para los nombres y no duplicamos el mapeo en JS.
+    titulo.textContent = select_opcion.selectedOptions[0].text;
     //iniciar caja con opciones para refuerzo nocturno
     opcion();
     initCajaRefuerzo(select_opcion.value, divNavSup, divRefuerzo);
@@ -263,7 +274,26 @@ function opcion(){
 }
 
 
-select_year.value = new Date().getFullYear();
+// WHY: ventana deslizante de años (-2 atrás, +10 adelante desde el año en
+//      curso) generada al cargar la página. Sustituye las <option> antes
+//      hardcodeadas en el HTML; así el rango se "refresca" en cada visita y
+//      el select nunca se queda corto al cambiar de año natural. Se ejecuta
+//      ANTES de inicializar TomSelect porque la librería copia las <option>
+//      del select nativo a su estado interno al construirse — si lo hiciéramos
+//      después tendríamos que mantener dos rutas (DOM + ts.addOptions).
+function poblarSelectYear() {
+    const actual = new Date().getFullYear();
+    const fragment = document.createDocumentFragment();
+    for (let y = actual - 2; y <= actual + 10; y++) {
+        const op = document.createElement('option');
+        op.value = y;
+        op.text = y;
+        fragment.appendChild(op);
+    }
+    select_year.appendChild(fragment);
+    select_year.value = actual;
+}
+poblarSelectYear();
 
 btn.addEventListener('click', nuevaFecha);
 select_opcion.addEventListener('change', initCalendario);
@@ -279,3 +309,20 @@ document.getElementById("rdLtr").addEventListener('click', opcion);
 
 initCalendario();
 nuevaFecha();
+
+// WHY: inicializar Tom Select DESPUÉS de la primera render — para entonces
+//      select_grupo y select_subgrupo ya están poblados, y TomSelect copia
+//      las <option> existentes a su estado interno. controlInput:null oculta
+//      la búsqueda (las listas son cortas y fijas, sería un cuadro de texto
+//      de adorno). dropdownParent:'body' saca el menú del stacking context
+//      de .toolbar — si no, queda tapado por .main que tiene mismo z-index
+//      y aparece más tarde en el DOM.
+const tomConfig = {
+    controlInput: null,
+    allowEmptyOption: false,
+    maxItems: 1,
+    create: false,
+    dropdownParent: 'body',
+};
+[select_opcion, select_year, select_grupo, select_subgrupo, select_num, select_ltr]
+    .forEach(el => new TomSelect(el, tomConfig));

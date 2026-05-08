@@ -1,287 +1,573 @@
-
-@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300&family=Roboto+Mono:wght@200;300;600&family=Roboto:wght@100;300;400&display=swap');
-
+/* =============================================================================
+   Tokens de diseño
+   ============================================================================= */
 :root {
-  --fuente-primaria:  'Roboto Mono', monospace;
+  /* Paleta — el azul SICAM (#276cc2) es el de la web madre y el del logo. */
+  --color-brand:        #276cc2;
+  --color-brand-dark:   #1c5fa3;
+  --color-brand-light:  #4a8ed4;
+  --color-bg:           #f4f6fa;
+  --color-surface:      #ffffff;
+  --color-text:         #1a2740;
+  --color-text-muted:   #5a6378;
+  --color-border:       #dde2eb;
+
+  /* WHY: estos cuatro colores son SEMÁNTICOS — el JS los aplica como clases en
+     cada <td> según el tipo de día. Cambiarlos rompe la lectura del calendario. */
+  --color-libre:        #276cc2;
+  --color-subgrupo:     #1a1a1a;
+  --color-sub1:         #e4de24;
+  --color-sub2:         #259924;
+
+  --shadow-card:  0 8px 24px -10px rgba(28, 95, 163, 0.25), 0 2px 6px -2px rgba(0, 0, 0, 0.06);
+  --shadow-soft:  0 2px 8px rgba(0, 0, 0, 0.06);
+  --shadow-hero:  0 6px 20px -6px rgba(28, 95, 163, 0.45);
+
+  --radius-card:  16px;
+  --radius-input: 10px;
+  --radius-pill:  999px;
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+
+  --font-heading: 'Dosis', system-ui, -apple-system, sans-serif;
+  --font-body:    'Catamaran', system-ui, -apple-system, sans-serif;
+
+  --max-width: 1280px;
 }
 
-* {
+/* =============================================================================
+   Reset
+   ============================================================================= */
+*,
+*::before,
+*::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: var(--fuente-primaria);
-  font-size: 1em;
+}
+
+html {
+  font-size: 16px;
 }
 
 body {
-  background-image: url(./img/logo-transparente.png), linear-gradient(90deg, rgba(2,0,36,1) 0%, rgba(132,153,176,1) 0%, rgba(161,210,226,1) 26%, rgba(0,212,255,1) 100%);
-  background-position: center;
-  position: relative;
+  font-family: var(--font-body);
+  font-weight: 500;
+  color: var(--color-text);
+  background-color: var(--color-bg);
+  /* WHY: flex column en body con .main flex:1 hace que el footer quede pegado
+     al fondo de forma natural — antes se usaba position:absolute, que se solapaba
+     con el contenido en pantallas cortas. */
   min-height: 100vh;
-  padding-bottom: 3em;
-}
-
-
-.header h2{
-  font-size: 1.3em;
-  padding-left: 0.5em;
-  padding-bottom: 0.5em;
-}
-
-
-.div-central-select {
-  width: 80%;
-  margin: 0 auto;
   display: flex;
-  justify-content: space-evenly;
+  flex-direction: column;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* WHY: el logo de fondo se monta como pseudo-elemento fijo y muy tenue; así no
+   estira el body ni interfiere con la grid del contenido. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url(./img/logo-transparente.png);
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: min(60vmin, 600px);
+  opacity: 0.04;
+  pointer-events: none;
+  z-index: 0;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+button {
+  font: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: inherit;
+}
+
+/* =============================================================================
+   Hero
+   ============================================================================= */
+.hero {
+  background: linear-gradient(135deg, var(--color-brand-dark) 0%, var(--color-brand) 60%, var(--color-brand-light) 100%);
+  color: white;
+  box-shadow: var(--shadow-hero);
+  position: relative;
+  z-index: 1;
+}
+
+.hero__inner {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: var(--space-5) var(--space-5);
+  display: flex;
   align-items: center;
-  font-weight: bold;
+  gap: var(--space-5);
+}
+
+.hero__logo {
+  width: 64px;
+  height: 64px;
+  /* WHY: el logo SICAM es azul sobre fondo transparente; sobre el gradiente azul
+     se pierde. Lo invertimos a blanco con un filtro CSS (sin tocar el PNG). */
+  filter: brightness(0) invert(1);
+  flex-shrink: 0;
+}
+
+.hero__text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.hero__eyebrow {
+  font-family: var(--font-body);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+.hero__title {
+  font-family: var(--font-heading);
+  font-size: clamp(1.4rem, 2.5vw, 2rem);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+/* =============================================================================
+   Toolbar (controles)
+   ============================================================================= */
+.toolbar {
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  position: relative;
+  z-index: 1;
+}
+
+/* WHY: grid 3-columnas (auto | 1fr | auto) ancla la categoría al borde
+   izquierdo y el botón al derecho — ambos quedan alineados con los bordes
+   de las cards (mismos padding y max-width que el main). El 1fr central
+   absorbe el sobrante y centra los filtros internos. */
+.toolbar__inner {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: var(--space-5) var(--space-5);
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: var(--space-5);
 }
 
 .nav__sup {
+  justify-self: center;
   display: flex;
-  justify-content: center;
   align-items: center;
+  gap: var(--space-5);
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+/* WHY: labels inline al lado del select (no encima) — evita el problema de
+   alturas distintas entre la categoría y los filtros. Tipografía Dosis
+   uppercase para que tengan jerarquía visual sin invadir. */
+.field {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.field label {
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--color-brand-dark);
+}
+
+.field--radio {
+  gap: var(--space-1);
+}
+
+.field--radio label {
+  font-size: 0.85rem;
+}
+
+.opcion-refuerzo {
+  display: flex;
+  gap: var(--space-3);
   flex-wrap: wrap;
 }
 
-.nav__sup label {
-  margin-left: 1.8em;
-  margin-right: 0.5em;
-}
-
-.btn {
-  padding: 0.3em 4em;
+.radio {
   cursor: pointer;
-  box-shadow: 2px 3px 5px black;
-  border-radius: 10px;
+  accent-color: var(--color-brand);
 }
 
-/*  ------------------------------------------------------------------------------------------------*/
-
-.container {
-  display: flex;
+/* =============================================================================
+   Selects
+   ============================================================================= */
+/* WHY: appearance:none elimina el chevron nativo del SO (que es feo en
+   Win/Linux e inconsistente entre navegadores) y nos deja pintar uno propio
+   con un SVG inline en background-image. El padding-right reserva el hueco. */
+.select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-text);
+  background-color: var(--color-surface);
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'><path fill='none' stroke='%231c5fa3' stroke-width='2' stroke-linecap='round' stroke-linejoin='round' d='M2.5 4.5l3.5 3.5 3.5-3.5'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 12px;
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-input);
+  padding: 0.55rem 2rem 0.55rem 0.85rem;
+  cursor: pointer;
+  transition: border-color 0.15s, box-shadow 0.15s, background-color 0.15s;
+  min-width: 5rem;
 }
 
-
-.aside {
-  margin: 0.5em 1em;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 20vw;
+.select:hover:not(:disabled) {
+  border-color: var(--color-brand-light);
+  background-color: #fafbfd;
 }
 
-.container-tabla {
+.select:focus {
+  outline: none;
+  border-color: var(--color-brand);
+  box-shadow: 0 0 0 3px rgba(39, 108, 194, 0.18);
+}
+
+.select:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* WHY: el menú desplegado (lista de <option>) lo pinta el SO, no podemos
+   estilarlo profundamente; aplicamos lo que sí permite — fondo y color. */
+.select option {
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  font-weight: 500;
+  padding: 0.4rem;
+}
+
+/* WHY: la categoría es el filtro principal — la distinguimos solo con borde
+   y texto en azul SICAM. Misma altura, padding y radius que los demás
+   selects para que Tom Select se comporte igual en todos.
+   width fijo (15rem) elimina el efecto "crece/encoge" al cambiar de opción
+   y, de regalo, hace que el dropdown (que TomSelect dimensiona al ancho
+   del control) tenga sitio de sobra para mostrar "Refuerzo_Nocturno" entero. */
+.select--primary {
+  border-color: var(--color-brand);
+  color: var(--color-brand-dark);
+  font-family: var(--font-heading);
+  font-weight: 700;
+  width: 15rem;
+}
+
+/* =============================================================================
+   Botón Buscar
+   ============================================================================= */
+.btn {
+  font-family: var(--font-heading);
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: white;
+  background: var(--color-brand);
+  padding: 0.6rem 1.8rem;
+  border-radius: var(--radius-pill);
+  box-shadow: 0 4px 12px -4px rgba(39, 108, 194, 0.5);
+  transition: transform 0.1s, box-shadow 0.15s, background 0.15s;
+}
+
+.btn:hover {
+  background: var(--color-brand-dark);
+  box-shadow: 0 6px 16px -4px rgba(39, 108, 194, 0.6);
+}
+
+.btn:active {
+  transform: translateY(1px);
+}
+
+/* =============================================================================
+   Main
+   ============================================================================= */
+.main {
+  flex: 1;
   width: 100%;
-  margin: 0.5em 1em;
-  display: grid;
-  grid-template-columns: 30em 30em 30em;
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: var(--space-5) var(--space-5);
+  position: relative;
+  z-index: 1;
 }
 
-.aside img {
-  width: 10em;
-  margin-top: 2em;
-}
-
-
+/* =============================================================================
+   Leyenda (rotulos)
+   ============================================================================= */
 .rotulos {
-  margin-top: 5em;
-  padding: 0.5em;
-  font-size: 0.8em;
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
   justify-content: center;
-  align-items: center;
-  flex-wrap: nowrap;
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+  padding: var(--space-3);
+  background: var(--color-surface);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-soft);
 }
 
 .rotulos h4 {
-  margin: 0.2em 0;
-  border-radius: 10px;
-  padding: 7px;
+  font-family: var(--font-heading);
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 0.4rem 1rem;
+  border-radius: var(--radius-pill);
 }
 
+.libres   { color: white; background-color: var(--color-libre); }
+.subgrupo { color: white; background-color: var(--color-subgrupo); }
+.sub1     { color: black; background-color: var(--color-sub1); }
+.sub2     { color: white; background-color: var(--color-sub2); }
 
-
-/*  -------------------------------------------------------------------------------------------------*/
-
+/* =============================================================================
+   Cards de meses
+   ============================================================================= */
+/* WHY: auto-fit + minmax permite que la grid pase de 3 → 2 → 1 columna
+   automáticamente según el ancho disponible; evita media queries explícitas. */
+.container-tabla {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: var(--space-5);
+}
 
 .div-mes {
-  margin: 0 auto;
-  margin-bottom: 0.5em;
   display: flex;
   justify-content: center;
 }
 
 table {
-  background-color: #edeef1;
-  border-radius: 10px;
-  box-shadow: 5px 5px 10px black;
-  margin-top: 0.5em;
+  width: 100%;
+  background-color: var(--color-surface);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  padding: var(--space-4);
+  border-collapse: separate;
+  border-spacing: 0.15rem;
 }
 
 table caption {
-  font-weight: bold;
+  font-family: var(--font-heading);
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--color-brand-dark);
+  padding-bottom: var(--space-3);
+  text-transform: uppercase;
+}
+
+table th {
+  font-family: var(--font-heading);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-text-muted);
+  padding: var(--space-2) 0;
+  border-bottom: 1px solid var(--color-border);
 }
 
 table td {
-  width: 3em;
+  width: 14.28%;
   text-align: center;
-  font-size: 0.9em;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--color-text);
+  padding: 0.4rem 0;
+  border-radius: 6px;
 }
 
+/* WHY: aplicamos los colores semánticos a los <td> que el JS marca con
+   `.libres`, `.subgrupo`, `.sub1`, `.sub2` — manteniendo legibilidad de texto. */
+table td.libres   { background-color: var(--color-libre);    color: white; font-weight: 700; }
+table td.subgrupo { background-color: var(--color-subgrupo); color: white; font-weight: 700; }
+table td.sub1     { background-color: var(--color-sub1);     color: black; font-weight: 700; }
+table td.sub2     { background-color: var(--color-sub2);     color: white; font-weight: 700; }
 
-
-footer {
-  background-color: #276cc2;
-  padding: 1em;
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-}
-
-select {
-  border-radius: 10px;
-  background-color: inherit;
-  text-align-last: center;
-  font-weight: bold;
-  cursor: pointer;
-  padding: 0.2em 0.4em;
-}
-
-option {
-  background-color: #edeef1;
-  text-align-last: center;
-}
-
-.libres {
+/* =============================================================================
+   Footer
+   ============================================================================= */
+.footer {
+  background: var(--color-brand-dark);
   color: white;
-  background-color: #276cc2;
+  text-align: center;
+  padding: var(--space-4);
+  margin-top: var(--space-6);
+  position: relative;
+  z-index: 1;
 }
 
-.subgrupo {
-  color: white;
-  background-color: black;
+.footer p {
+  font-family: var(--font-heading);
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
 }
 
-.sub1 {
-  color: black;
-  background-color: #e4de24;
-}
-
-.sub2 {
-  color: white;
-  background-color: #259924;
-}
-
-.opcion-refuerzo {
-  display: flex;
-  flex-direction: column;
-  margin-left: 1em;
-}
-
-
-
-.select-num label,
-.select-ltr label {
-  margin-left: 0;
-}
-
-
-@media screen and (max-width: 1300px) {
-  body {
-    font-size: 0.9em;
+/* =============================================================================
+   Responsive — pequeñas correcciones (la grid se adapta sola con auto-fit)
+   ============================================================================= */
+@media (max-width: 720px) {
+  .hero__inner,
+  .toolbar__inner,
+  .main {
+    padding-left: var(--space-4);
+    padding-right: var(--space-4);
   }
 
-  .btn {
-    padding: 0.3em 2em; 
-    font-weight: bold;
+  .hero__logo {
+    width: 48px;
+    height: 48px;
+  }
+
+  /* WHY: en mobile la grid de 3 columnas se colapsa a una sola, todo apilado
+     y centrado. Es lo más limpio cuando no hay ancho para tres bloques. */
+  .toolbar__inner {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: var(--space-3);
   }
 
   .nav__sup {
-    display: grid;
-    grid-template-columns: 7em 5em;
-    grid-gap: 0.4em;
+    justify-content: center;
   }
-
-  .rotulos {
-    font-size: 0.7em;
-    padding: 0em;
-  }
-  
-  .opcion-refuerzo {
-    grid-column: 1 / 3;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .container-tabla {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  
 }
 
+/* =============================================================================
+   Tom Select — sólo overrides de COLOR. La estructura (chevron, padding-right
+   vía --ts-pr-caret, hover, sizing) la lleva el tema default de la librería.
+   Si hay que tocar más cosas aquí, hay que pensárselo dos veces antes.
+   ============================================================================= */
+/* WHY: el .ts-wrapper hereda las classes del <select> nativo (.select,
+   .select--primary). Los estilos de .select se pensaron para un <select>
+   y meten padding/border que el wrapper no necesita: lo dejamos transparente
+   y el "control" visible lo gestiona .ts-control dentro. */
+.ts-wrapper.select {
+  padding: 0;
+  border: 0;
+  background-image: none;
+  background-color: transparent;
+}
 
+.ts-wrapper {
+  font-family: var(--font-body);
+}
 
+/* Borde, radio y tamaño de texto en línea con la paleta SICAM. NO tocamos
+   padding ni overflow. font-size 1rem porque el default del tema es 13px,
+   que se queda corto frente al resto de la UI. */
+.ts-wrapper.single .ts-control {
+  border: 1.5px solid var(--color-border);
+  border-radius: var(--radius-input);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text);
+}
 
-@media screen and (max-width: 850px) {
-  body {
-    font-size: 0.7em;
-  }
+.ts-wrapper.single.focus .ts-control {
+  border-color: var(--color-brand);
+  box-shadow: 0 0 0 3px rgba(39, 108, 194, 0.18);
+}
 
-  .div-central-select { 
-    width: 95%;
-  }
+.ts-dropdown {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-input);
+  box-shadow: 0 12px 28px -8px rgba(28, 95, 163, 0.25), 0 2px 4px rgba(0, 0, 0, 0.04);
+  margin-top: 0.35rem;
+}
 
-  .select-opcion {
-    width: 25%;
-  }
+/* WHY: en macOS los scrollbars nativos se ocultan cuando no se hace scroll,
+   y eso engaña al usuario haciéndole creer que la lista termina donde se
+   ve. Customizando el scrollbar (Webkit) y declarando scrollbar-width
+   (Firefox) el navegador deja de aplicar auto-hide y lo muestra siempre
+   que haya overflow real — y SOLO cuando lo hay, así no aparece un canal
+   vacío en listas cortas (categorías, grupos). */
+.ts-dropdown .ts-dropdown-content {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-brand-light) transparent;
+}
+.ts-dropdown .ts-dropdown-content::-webkit-scrollbar {
+  width: 8px;
+}
+.ts-dropdown .ts-dropdown-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+.ts-dropdown .ts-dropdown-content::-webkit-scrollbar-thumb {
+  background-color: var(--color-brand-light);
+  border-radius: 4px;
+  border: 2px solid var(--color-surface);
+}
+.ts-dropdown .ts-dropdown-content::-webkit-scrollbar-thumb:hover {
+  background-color: var(--color-brand);
+}
 
-  .nav__sup {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    
-  }
+/* WHY: Tom Select default carga en el bundle DESPUÉS de mi CSS y tiene
+     `.ts-dropdown,.ts-control,...{ font-size:13px }`
+   con la misma specificity (0,1,0) que cualquier override sobre .ts-dropdown,
+   por lo que mi regla pierde por orden de cascade. Apuntando a .option (selector
+   compuesto, specificity 0,2,0) gano sin recurrir a !important. */
+.ts-dropdown .option {
+  font-size: 1rem;
+}
 
-  .btn {
-    margin-left: 2em;
-    margin-right: 3em;
-  }
+/* Opción al hover/keyboard nav (Tom Select usa class .active, no :hover) */
+.ts-dropdown .active {
+  background-color: rgba(39, 108, 194, 0.12);
+  color: var(--color-brand-dark);
+}
 
-  .container {
-    flex-direction: column;
-  }
+/* Opción actualmente seleccionada vista en el menú abierto */
+.ts-dropdown .selected {
+  background-color: var(--color-brand);
+  color: white;
+}
 
-  .aside {
-    flex-direction: row;
-    justify-content: space-between;
-    align-items: start;
-    width: 90%;
-  }
+.ts-dropdown .selected.active {
+  background-color: var(--color-brand-dark);
+  color: white;
+}
 
-  .aside img {
-     margin-top: 0;
-     width: 10%;
-  }
-
-  .rotulos {
-    flex-direction: row;
-    flex-wrap: wrap;
-    margin-top: 0;
-    margin-left: auto;
-    margin-right: auto;
-  }
-
-  .rotulos h4 {
-    margin: 1em;
-  }
-
-  .container-tabla {
-    grid-template-columns: repeat(1, 1fr);
-    margin: 0.5em 0;
-    font-size: 1.4em;
-  }
-  
+/* Variante primary (categoría): solo borde y texto en azul SICAM, todo lo
+   demás idéntico a un select normal — Tom Select no tiene que pelear con
+   nada raro. */
+.ts-wrapper.select--primary.single .ts-control {
+  border-color: var(--color-brand);
+  color: var(--color-brand-dark);
+  font-family: var(--font-heading);
+  font-weight: 700;
 }

@@ -13,5 +13,8 @@
   "license": "ISC",
   "devDependencies": {
     "vite": "^8.0.11"
+  },
+  "dependencies": {
+    "tom-select": "^2.6.0"
   }
 }
