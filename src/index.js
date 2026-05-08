@@ -7,6 +7,7 @@ import 'tom-select/dist/css/tom-select.default.css';
 
 import { getDatosListaLibres, getDatosListaSubgrupo, getDatosListaSubComunes } from './calendarios/DatosFechas.js';
 import { initSelectGrupo, initSelectSubgrupo, initRotulos, initDivNavSup, initCajaRefuerzo } from './calendarios/InitCabecera.js';
+import { CATEGORIAS, NUMEROS_REFUERZO, LETRAS_REFUERZO } from './calendarios/Constantes.js';
 
 let currentDate;
 let titulo = document.getElementById('titulo');
@@ -274,25 +275,49 @@ function opcion(){
 }
 
 
+// WHY: helper genérico para rellenar un <select> a partir de un array.
+//      Acepta dos formatos para no obligar a envolver datos triviales:
+//        - strings/numbers: value y text iguales (ej. años, números, letras).
+//        - objetos { value, text }: cuando el id interno difiere del texto
+//          que ve el usuario (ej. "Inspector_Noche" → "Inspector Noche").
+//      Usamos un DocumentFragment para hacer un único reflow al final,
+//      en vez de uno por cada appendChild dentro del bucle.
+function poblarSelect(select, items) {
+    const fragment = document.createDocumentFragment();
+    for (const item of items) {
+        const op = document.createElement('option');
+        const esObjeto = typeof item === 'object' && item !== null;
+        op.value = esObjeto ? item.value : item;
+        op.text = esObjeto ? item.text : item;
+        fragment.appendChild(op);
+    }
+    select.appendChild(fragment);
+}
+
+// WHY: las options de los selects estáticos (categoría, num, ltr) viven en
+//      Constantes.js y se inyectan al cargar. Antes estaban hardcodeadas en
+//      el HTML — moverlas a un módulo centraliza renombres y deja la vista
+//      como pura estructura. Debe correr ANTES de TomSelect (la librería
+//      fotografía las <option> al construirse).
+function poblarSelectsEstaticos() {
+    poblarSelect(select_opcion, CATEGORIAS);
+    poblarSelect(select_num, NUMEROS_REFUERZO);
+    poblarSelect(select_ltr, LETRAS_REFUERZO);
+}
+
 // WHY: ventana deslizante de años (-2 atrás, +10 adelante desde el año en
 //      curso) generada al cargar la página. Sustituye las <option> antes
 //      hardcodeadas en el HTML; así el rango se "refresca" en cada visita y
-//      el select nunca se queda corto al cambiar de año natural. Se ejecuta
-//      ANTES de inicializar TomSelect porque la librería copia las <option>
-//      del select nativo a su estado interno al construirse — si lo hiciéramos
-//      después tendríamos que mantener dos rutas (DOM + ts.addOptions).
+//      el select nunca se queda corto al cambiar de año natural.
 function poblarSelectYear() {
     const actual = new Date().getFullYear();
-    const fragment = document.createDocumentFragment();
-    for (let y = actual - 2; y <= actual + 10; y++) {
-        const op = document.createElement('option');
-        op.value = y;
-        op.text = y;
-        fragment.appendChild(op);
-    }
-    select_year.appendChild(fragment);
+    const years = [];
+    for (let y = actual - 2; y <= actual + 10; y++) years.push(y);
+    poblarSelect(select_year, years);
     select_year.value = actual;
 }
+
+poblarSelectsEstaticos();
 poblarSelectYear();
 
 btn.addEventListener('click', nuevaFecha);

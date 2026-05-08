@@ -32,19 +32,9 @@
     <nav class="toolbar">
       <div class="toolbar__inner">
 
-        <!-- WHY: select_opcion (categoría) es el filtro principal — primero a la izquierda. -->
-        <select id="select_opcion" class="select select--primary">
-          <option value="Conductor">Conductor</option>
-          <option value="Inspector">Inspector</option>
-          <option value="Inspector_Noche">Inspector Noche</option>
-          <option value="Grua">Grua Asistencia</option>
-          <option value="GruaDSM">Grua DSM</option>
-          <option value="GruaDSM_Noche">Grua DSM Noche</option>
-          <option value="ParkingDSM_100">Parking DSM 100%</option>
-          <option value="ParkingDSM_50">Parking DSM 50%</option>
-          <option value="Refuerzo_Nocturno">Refuerzo Nocturno</option>
-          <option value="Buho">Buho</option>
-        </select>
+        <!-- WHY: select_opcion (categoría) es el filtro principal — primero a la izquierda.
+             Las <option> se generan desde Constantes.js (CATEGORIAS) al cargar la página. -->
+        <select id="select_opcion" class="select select--primary"></select>
 
         <div id="nav_sup" class="nav__sup">
           <div class="field">
@@ -66,38 +56,18 @@
           </div>
 
           <div id="opcion-refuerzo" class="opcion-refuerzo">
+            <!-- WHY: <option> generadas desde Constantes.js (NUMEROS_REFUERZO,
+                 LETRAS_REFUERZO) al cargar la página. -->
             <div class="field field--radio">
               <input class="radio" id="rdNum" type="radio" value="Num" name="opcion" checked/>
               <label for="select-num">Num</label>
-              <select name="select-num" id="select-num" class="select">
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-                <option value="6">6</option>
-                <option value="7">7</option>
-                <option value="8">8</option>
-                <option value="9">9</option>
-              </select>
+              <select name="select-num" id="select-num" class="select"></select>
             </div>
 
             <div class="field field--radio">
               <input class="radio" id="rdLtr" type="radio" value="Ltr" name="opcion"/>
               <label for="select-ltr">Ltr</label>
-              <select name="select-ltr" id="select-ltr" class="select">
-                <option value="A">A</option>
-                <option value="B">B</option>
-                <option value="C">C</option>
-                <option value="D">D</option>
-                <option value="E">E</option>
-                <option value="F">F</option>
-                <option value="G">G</option>
-                <option value="H">H</option>
-                <option value="I">I</option>
-                <option value="J">J</option>
-                <option value="K">K</option>
-              </select>
+              <select name="select-ltr" id="select-ltr" class="select"></select>
             </div>
           </div>
         </div>
