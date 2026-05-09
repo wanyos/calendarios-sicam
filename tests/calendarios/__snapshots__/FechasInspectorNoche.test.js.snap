@@ -1,0 +1,21 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`FechasInspectorNoche — BUG-01: subgrupos J grupo 4 y 5 (PENDIENTE validación oficial) > grupo 4 J: snapshot completo (hipótesis -1 día respecto a Inspector) 1`] = `
+[
+  "2026-03-10",
+  "2026-05-13",
+  "2026-07-18",
+  "2026-09-21",
+  "2026-12-06",
+]
+`;
+
+exports[`FechasInspectorNoche — BUG-01: subgrupos J grupo 4 y 5 (PENDIENTE validación oficial) > grupo 5 J: snapshot completo (hipótesis -1 día respecto a Inspector) 1`] = `
+[
+  "2026-03-03",
+  "2026-05-06",
+  "2026-07-11",
+  "2026-09-14",
+  "2026-11-29",
+]
+`;
