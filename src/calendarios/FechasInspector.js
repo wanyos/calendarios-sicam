@@ -1,5 +1,4 @@
 
-//const FechasConductorInspector = require('./FechasConductorInspector');
 import {getLibresConductorInspector, getListaSubgrupoConductorInspector, getListaSubComunesConductorInspector} from './FechasConductorInspector.js';
 
 export function getListaLibresInspector(year, grupo) {
@@ -7,7 +6,6 @@ export function getListaLibresInspector(year, grupo) {
     const secuenciaLibres = [2, 3, 2, 3];
     const secuenciaTrabajo = [8, 6, 7, 8];
     const totalSecuencia = 35;
-    //return FechasConductorInspector.getLibresConductorInspector(year, grupo, fechaInitGrupo1_2022, totalSecuencia, secuenciaLibres, secuenciaTrabajo);
     return getLibresConductorInspector(year, grupo, fechaInitGrupo1_2022, totalSecuencia, secuenciaLibres, secuenciaTrabajo);
 }
 
@@ -25,20 +23,19 @@ export function getListaLibresInspector(year, grupo) {
 
 
 export function getListaSubgrupoInspector(year, grupo, subgrupo) {
-    let fechaInit = getFechaSubgrupo2022(grupo, subgrupo);
-    let totalSecuencia = 350;
+    const fechaInit = getFechaSubgrupo2022(grupo, subgrupo);
+    const totalSecuencia = 350;
     //La secuencia de dias en orden del array son:
         // X - M - J - V - L  
-    let secu = [65, 76, 79, 64, 66];
-    let pos = getPosSecuencia(fechaInit);
+    const secu = [65, 76, 79, 64, 66];
+    const pos = getPosSecuencia(fechaInit);
 
-    //return FechasConductorInspector.getListaSubgrupoConductorInspector(year, fechaInit, totalSecuencia, secu, pos);
     return getListaSubgrupoConductorInspector(year, fechaInit, totalSecuencia, secu, pos);
 }
 
 
 function getFechaSubgrupo2022(grupo, subgrupo) {
-    let pos = getNumeroSubgrupo(subgrupo);
+    const pos = getNumeroSubgrupo(subgrupo);
     if(grupo >= 1 && grupo <= 5){
         return subgrupos[grupo-1][pos];      
     }
@@ -71,8 +68,8 @@ function getNumeroSubgrupo(subgrupo) {
      * @return 
      */
  function getPosSecuencia(fechaInit){
-    let pos = 0;
-    let day = fechaInit.getDay();
+    const pos = 0;
+    const day = fechaInit.getDay();
    switch(day){
        case 2: return 2;
        case 3: return 1;
@@ -97,9 +94,8 @@ function getNumeroSubgrupo(subgrupo) {
 
 
        export function getListaSubComunesInspector(year, grupo, subgrupo) {
-            let fechaInit = getFechaSubComunes2022(grupo, subgrupo);
+            const fechaInit = getFechaSubComunes2022(grupo, subgrupo);
             const totalSecuencia = 70;
-            //return FechasConductorInspector.getListaSubComunesConductorInspector(year, fechaInit, totalSecuencia);
             return getListaSubComunesConductorInspector(year, fechaInit, totalSecuencia);
         }
 
@@ -118,6 +114,3 @@ function getNumeroSubgrupo(subgrupo) {
 
 
 
-//module.exports.getListaLibresInspector = getListaLibresInspector;
-//module.exports.getListaSubgrupoInspector = getListaSubgrupoInspector;
-//module.exports.getListaSubComunesInspector = getListaSubComunesInspector;

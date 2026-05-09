@@ -49,7 +49,7 @@ export function getListaSubgrupoBuho(year, grupo, subgrupo){
     if (year > 2022) {
         fechaInit = new Date(getFechaInit(year, fechaInit, totalSec));
     }
-    let posSecuencia = getPosSecuencia(fechaInit);
+    const posSecuencia = getPosSecuencia(fechaInit);
     return getListaSubgrupo(year, fechaInit, secuencia, posSecuencia);
 }
 
@@ -80,12 +80,12 @@ function getPosSubgrupo(subgrupo) {
 //miercoles = 0, domingo = 1, martes = 2, lunes =1
 function getPosSecuencia(fechaInit) {
     let pos = 0;
-    let day = fechaInit.getDay();
-    if(day == 0){
+    const day = fechaInit.getDay();
+    if(day === 0){
         pos = 1;
-    } else if(day == 2){
+    } else if(day === 2){
         pos = 2;
-    } else if(day == 1){
+    } else if(day === 1){
         pos = 3;
     }
     return pos;
@@ -106,7 +106,7 @@ function getPosSecuencia(fechaInit) {
 
 
     export function getListaSubComunesBuho(year, grupo, subgrupo) {
-        let fechaInit = getFechaSubComunes2020(grupo, subgrupo);
+        const fechaInit = getFechaSubComunes2020(grupo, subgrupo);
         const totalSecuencia = 70;
         return getListaSubgrupoReduccion(year, fechaInit, totalSecuencia);
     }

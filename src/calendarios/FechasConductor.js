@@ -26,19 +26,19 @@ const subgrupos = [
 
 
 export function getListaSubgrupoConductor(year, grupo, subgrupo) {
-    let fechaInit = getFechaSubgrupo2020(grupo, subgrupo);
-    let totalSecuencia = 280;
+    const fechaInit = getFechaSubgrupo2020(grupo, subgrupo);
+    const totalSecuencia = 280;
     //distancias entre dias, la secuencia de dias es jueves, lunes, miercoles y martes
     //el array sigue la misma secuencia
-    let secu = [60, 65, 76, 79];
-    let pos = getPosSecuencia(fechaInit);
+    const secu = [60, 65, 76, 79];
+    const pos = getPosSecuencia(fechaInit);
 
     return getListaSubgrupoConductorInspector(year, fechaInit, totalSecuencia, secu, pos);
 }
 
 
 function getFechaSubgrupo2020(grupo, subgrupo) {
-    let pos = getNumeroSubgrupo(subgrupo);
+    const pos = getNumeroSubgrupo(subgrupo);
     if(grupo >= 1 && grupo <= 5){
         return subgrupos[grupo-1][pos];      
     }
@@ -67,12 +67,12 @@ function getNumeroSubgrupo(subgrupo) {
      */
  function getPosSecuencia(fechaInit) {
     let pos = 0;
-    let day = fechaInit.getDay();
-    if(day == 1){
+    const day = fechaInit.getDay();
+    if(day === 1){
         pos = 1;
-    } else if(day == 3){
+    } else if(day === 3){
         pos = 2;
-    } else if(day == 2){
+    } else if(day === 2){
         pos = 3;
     }
     return pos;
@@ -93,7 +93,7 @@ function getNumeroSubgrupo(subgrupo) {
 
 
     export function getListaSubComunesConductor(year, grupo, subgrupo) {
-            let fechaInit = getFechaSubComunes2020(grupo, subgrupo);
+            const fechaInit = getFechaSubComunes2020(grupo, subgrupo);
             const totalSecuencia = 70;
             return getListaSubComunesConductorInspector(year, fechaInit, totalSecuencia);
         }

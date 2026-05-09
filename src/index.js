@@ -10,20 +10,20 @@ import { initSelectGrupo, initSelectSubgrupo, initRotulos, initDivNavSup, initCa
 import { CATEGORIAS, NUMEROS_REFUERZO, LETRAS_REFUERZO } from './calendarios/Constantes.js';
 
 let currentDate;
-let titulo = document.getElementById('titulo');
-let select_opcion = document.getElementById('select_opcion');
-let dias_semana = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
-let select_year = document.getElementById("select_year");
-let btn = document.getElementById('btn');
-let contenedor = document.getElementById("container-tabla");
-let rotulosSubgrupo = document.getElementById('rotulos-subgrupo');
-let divNavSup = document.getElementById('nav_sup');
-let divRefuerzo = document.getElementById('opcion-refuerzo');
+const titulo = document.getElementById('titulo');
+const select_opcion = document.getElementById('select_opcion');
+const dias_semana = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
+const select_year = document.getElementById("select_year");
+const btn = document.getElementById('btn');
+const contenedor = document.getElementById("container-tabla");
+const rotulosSubgrupo = document.getElementById('rotulos-subgrupo');
+const divNavSup = document.getElementById('nav_sup');
+const divRefuerzo = document.getElementById('opcion-refuerzo');
 
-let select_grupo = document.getElementById("select_grupo");
-let select_subgrupo = document.getElementById("select_subgrupo");
-let select_num = document.getElementById('select-num');
-let select_ltr = document.getElementById('select-ltr');
+const select_grupo = document.getElementById("select_grupo");
+const select_subgrupo = document.getElementById("select_subgrupo");
+const select_num = document.getElementById('select-num');
+const select_ltr = document.getElementById('select-ltr');
 
 let listaLibresYear = [];
 let listaSubgrupoYear = [];
@@ -32,24 +32,24 @@ let listaSubComunesYear = [];
 
 /*dia que empieza el mes*/
 function startDay(monthNumber) {
-    let start = new Date(currentDate.getFullYear(), monthNumber - 1, 1);
-    return ((start.getDay() - 1) == -1) ? 6 : start.getDay() - 1;
+    const start = new Date(currentDate.getFullYear(), monthNumber - 1, 1);
+    return ((start.getDay() - 1) === -1) ? 6 : start.getDay() - 1;
 }
 
 
 /*Anyo bisiesto*/
 function isLeap() {
-    return ((currentDate.getFullYear() % 100 !== 0) && (currentDate.getFullYear() % 4 == 0)
-        || (currentDate.getFullYear() % 400 == 0));
+    return ((currentDate.getFullYear() % 100 !== 0) && (currentDate.getFullYear() % 4 === 0)
+        || (currentDate.getFullYear() % 400 === 0));
 }
 
 
 
 /*total dias de mes*/
 function getTotalDays(month) {
-    if (month == 1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10 || month == 12) {
+    if (month === 1 || month === 3 || month === 5 || month === 7 || month === 8 || month === 10 || month === 12) {
         return 31;
-    } else if (month == 4 || month == 6 || month == 9 || month == 11) {
+    } else if (month === 4 || month === 6 || month === 9 || month === 11) {
         return 30;
     } else {
         return isLeap() ? 29 : 28;
@@ -61,12 +61,12 @@ const comprobarDia = (numDia, mes) => {
         if (listaLibresYear.length > 0 && comprobarArray(listaLibresYear, numDia, mes)) {
             listaLibresYear.shift();
             return "libres";
-        } else if (listaSubgrupoYear != undefined && listaSubgrupoYear.length > 0 && comprobarArray(listaSubgrupoYear, numDia, mes)) {
+        } else if (listaSubgrupoYear !== undefined && listaSubgrupoYear.length > 0 && comprobarArray(listaSubgrupoYear, numDia, mes)) {
             listaSubgrupoYear.shift();
             return "subgrupo";
-        } else if (listaSubComunesYear != undefined && listaSubComunesYear.length > 0 && comprobarArray(listaSubComunesYear, numDia, mes)) {
+        } else if (listaSubComunesYear !== undefined && listaSubComunesYear.length > 0 && comprobarArray(listaSubComunesYear, numDia, mes)) {
             listaSubComunesYear.shift();
-            let sub = select_subgrupo.value;
+            const sub = select_subgrupo.value;
             if (sub === "A" || sub === "C" || sub === "E" || sub === "G" || sub === "I") {
                 return "sub1";
             } else {
@@ -87,7 +87,7 @@ function comprobarArray(array, numDia, mes) {
 
 
 function getArrayMes(espacios, totalDias) {
-    let arrayMes = new Array();
+    const arrayMes = new Array();
     let contador = 0;
     let num_dia = 1;
 
@@ -104,8 +104,8 @@ function getArrayMes(espacios, totalDias) {
 
 
 function rellenarDias(tabla, mes) {
-    let numeroDias = getTotalDays(mes);
-    let espacios = startDay(mes) - 1;
+    const numeroDias = getTotalDays(mes);
+    const espacios = startDay(mes) - 1;
     let tipoDia;
     let fragment = document.createDocumentFragment();
 
@@ -115,11 +115,11 @@ function rellenarDias(tabla, mes) {
         if (diaSemana === 0) {
             fragment = document.createElement("tr");
         }
-        let columna = document.createElement("td");
+        const columna = document.createElement("td");
 
         tipoDia = comprobarDia(d, mes);
 
-        let dia = document.createTextNode(d);
+        const dia = document.createTextNode(d);
         columna.appendChild(dia);
         columna.setAttribute("class", tipoDia);
 
@@ -140,10 +140,10 @@ function rellenarDias(tabla, mes) {
 * @param {*} tabla elemento tabla
 */
 function rellenarTablaCabecera(tabla) {
-    let fila = document.createElement("tr");
+    const fila = document.createElement("tr");
     for (let a = 0; a < dias_semana.length; a++) {
-        let cabecera = document.createElement("th");
-        let d = document.createTextNode(dias_semana[a]);
+        const cabecera = document.createElement("th");
+        const d = document.createTextNode(dias_semana[a]);
         cabecera.appendChild(d);
         fila.appendChild(cabecera);
     }
@@ -177,9 +177,9 @@ function getNombre(n) {
 * @param {*} num_mes numero del mes
 */
 function crearTabla(cont_tabla, nombre, num_mes) {
-    let tabla = document.createElement("table");
-    let nombre_mes = document.createElement("caption");
-    let contenido = document.createTextNode(nombre);
+    const tabla = document.createElement("table");
+    const nombre_mes = document.createElement("caption");
+    const contenido = document.createTextNode(nombre);
     nombre_mes.appendChild(contenido);
     tabla.appendChild(nombre_mes);
     rellenarTablaCabecera(tabla);
@@ -196,7 +196,7 @@ function crearMeses() {
     setDatos();
     const fragment = document.createDocumentFragment();
     for (let a = 1; a <= 12; a++) {
-        let cont_tabla = document.createElement("div");
+        const cont_tabla = document.createElement("div");
         cont_tabla.setAttribute("class", "div-mes");
         crearTabla(cont_tabla, getNombre(a), a);
         fragment.appendChild(cont_tabla);
@@ -215,7 +215,7 @@ function nuevaFecha() {
 
 
 function setDatos() {
-    let year = parseInt(select_year.value);
+    const year = parseInt(select_year.value);
     let grupo;
     if(select_opcion.value === 'Refuerzo_Nocturno'){
         grupo = select_grupo.value;
@@ -223,8 +223,8 @@ function setDatos() {
         grupo = parseInt(select_grupo.value);
     }
 
-    let subgrupo = select_subgrupo.value;
-    let grupoDos = getGrupoDos();
+    const subgrupo = select_subgrupo.value;
+    const grupoDos = getGrupoDos();
 
     listaLibresYear = getDatosListaLibres(select_opcion.value, year, grupo, grupoDos);
     //console.log(listaLibresYear)
@@ -235,7 +235,7 @@ function setDatos() {
 }
 
 function getGrupoDos(){
-    let rdActivo = document.querySelector('input[name="opcion"]:checked');
+    const rdActivo = document.querySelector('input[name="opcion"]:checked');
     if(rdActivo.value === 'Num'){
         return select_num.value;
     } else if(rdActivo.value === 'Ltr'){
@@ -264,7 +264,7 @@ function initCalendario() {
 }
 
 function opcion(){
-    let elementoActivo = document.querySelector('input[name="opcion"]:checked');
+    const elementoActivo = document.querySelector('input[name="opcion"]:checked');
     if(elementoActivo.value === 'Num') {
         select_num.disabled = false;
         select_ltr.disabled = true;
@@ -332,8 +332,10 @@ document.getElementById("rdNum").addEventListener('click', opcion);
 document.getElementById("rdLtr").addEventListener('click', opcion);
 
 
+// WHY: initCalendario() ya cierra con nuevaFecha() internamente (vía la cadena
+//      initRotulos → nuevaFecha). Llamarlo otra vez aquí provocaba un doble
+//      build del DOM al cargar (flash visible).
 initCalendario();
-nuevaFecha();
 
 // WHY: inicializar Tom Select DESPUÉS de la primera render — para entonces
 //      select_grupo y select_subgrupo ya están poblados, y TomSelect copia

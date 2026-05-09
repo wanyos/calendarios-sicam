@@ -4,7 +4,6 @@ import {getFechaInit, getListaLibres} from './FuncionesComunes.js';
 export function getListaLibresRefuerzoNocturno(year, grupo, grupoDos){
     let fechaInit = new Date(2022, 0, 2);
     const totalSecuencia = 280;
-    let pos = 0;
 
     const secuenciaLibres = [3, 1, 1, 1, 2, 1, 2, 1, 4,
         2, 4, 1, 1, 1, 2, 1,
@@ -21,18 +20,18 @@ export function getListaLibresRefuerzoNocturno(year, grupo, grupoDos){
         7, 6, 2, 4, 4, 3, 7, 6,
         2, 4, 4, 3, 7, 6, 2];
 
-        fechaInit = new Date(getFechaInit(year, fechaInit, totalSecuencia));
-        if(grupoDos === '5'){
-            fechaInit = new Date(fechaInit.getFullYear(), fechaInit.getMonth(), fechaInit.getDate()-3);
-        }
-        pos = getPos(grupo, grupoDos);
-        return getListaLibres(year, fechaInit, secuenciaLibres, secuenciaTrabajo, pos);
+    fechaInit = new Date(getFechaInit(year, fechaInit, totalSecuencia));
+    if(grupoDos === '5'){
+        fechaInit = new Date(fechaInit.getFullYear(), fechaInit.getMonth(), fechaInit.getDate()-3);
+    }
+    const pos = getPos(grupo, grupoDos);
+    return getListaLibres(year, fechaInit, secuenciaLibres, secuenciaTrabajo, pos);
 }
 
 
 function getPos(grupo, grupoDos){
     let pos = 0;
-    let valor = getEntero(grupoDos);
+    const valor = getEntero(grupoDos);
 
     if(grupo === 'A'){
 
@@ -55,7 +54,7 @@ function getPos(grupo, grupoDos){
 }
 
 function getEntero(grupoDos){
-    let valor = parseInt(grupoDos);
+    const valor = parseInt(grupoDos);
     if(isNaN(valor)){
         return 0;
     } 

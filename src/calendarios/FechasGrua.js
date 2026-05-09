@@ -52,7 +52,7 @@ function getPos(grupo){
         if (year > 2022) {
             fechaInit = new Date(getFechaInit(year, fechaInit, totalSec));
         }
-        let posSecuencia = getPosSecuencia(fechaInit);
+        const posSecuencia = getPosSecuencia(fechaInit);
        
         return getListaSubgrupo(year, fechaInit, secuencia, posSecuencia);
     }

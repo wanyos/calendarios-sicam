@@ -47,10 +47,10 @@ export function initSelectSubgrupo(tipoCalendario, select, select_value) {
 
 
 export function initRotulos(tipoCalendario, div) {
-    let libre = div.firstElementChild;
-    let subgrupo = libre.nextElementSibling;
-    let sub1 = subgrupo.nextElementSibling;
-    let sub2 = div.lastElementChild;
+    const libre = div.firstElementChild;
+    const subgrupo = libre.nextElementSibling;
+    const sub1 = subgrupo.nextElementSibling;
+    const sub2 = div.lastElementChild;
 
     if(tipoCalendario === 'Conductor' || tipoCalendario === 'Buho'){
         subgrupo.style.display = "block";
@@ -159,7 +159,7 @@ function setDatosSelect(select, array) {
  * @param {*} select_value 
  */
 function getArrayGruaDSM(select_value) {
-    let array = [];
+    const array = [];
     let valor = parseInt(select_value);
     array.push(valor); //hay que incluir como primer número el mismo que el grupo
     for (let a = 0; a < 9; a++) {
