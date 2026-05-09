@@ -17,7 +17,7 @@ export default defineConfig({
     // WHY: outDir es relativo al root, por eso '../build'. Mantiene
     // el contrato con el deploy actual: la carpeta de producción
     // sigue siendo build/ en la raíz del repo.
-    outDir: '../build',
+    outDir: '../dist',
 
     // WHY: outDir está fuera del root, así que Vite por seguridad no
     // la vacía por defecto (para evitar borrados accidentales). Aquí
