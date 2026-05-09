@@ -7,23 +7,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <meta name="google" value="notranslate"/>
 
-    <!-- WHY: Dosis (titulares) + Catamaran (cuerpo) son las Google Fonts que usa sicamemt.org
-         como sustitutas open-source de su DinPro propietaria. preconnect acelera la carga. -->
+    <!-- WHY: Dosis (titulares) + Catamaran (cuerpo) — pareja open-source de
+         Google Fonts que se carga vía preconnect para acelerar el render. -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Catamaran:wght@400;500;600;700&family=Dosis:wght@500;600;700;800&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="./estilo.css"/>
-    <title>Calendarios · SICAM</title>
+    <title>Calendarios</title>
   </head>
 
   <body translate="no">
 
     <header class="hero">
       <div class="hero__inner">
-        <img class="hero__logo" src="./img/logo-sicam.png" alt="SICAM Madrid"/>
         <div class="hero__text">
-          <span class="hero__eyebrow">Sindicato de Conductores · EMT Madrid</span>
           <h2 id="titulo" class="hero__title"></h2>
         </div>
       </div>
@@ -90,9 +88,7 @@
       <div id="container-tabla" class="container-tabla"></div>
     </main>
 
-    <footer class="footer">
-      <p>© Sicam EMT · Madrid</p>
-    </footer>
+    <footer class="footer"></footer>
 
     <script type="module" src="./index.js"></script>
   </body>

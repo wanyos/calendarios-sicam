@@ -2,7 +2,7 @@
    Tokens de diseño
    ============================================================================= */
 :root {
-  /* Paleta — el azul SICAM (#276cc2) es el de la web madre y el del logo. */
+  /* Paleta — color de marca principal (#276cc2). */
   --color-brand:        #276cc2;
   --color-brand-dark:   #1c5fa3;
   --color-brand-light:  #4a8ed4;
@@ -71,21 +71,6 @@ body {
   overflow-x: hidden;
 }
 
-/* WHY: el logo de fondo se monta como pseudo-elemento fijo y muy tenue; así no
-   estira el body ni interfiere con la grid del contenido. */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background-image: url(./img/logo-transparente.png);
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: min(60vmin, 600px);
-  opacity: 0.04;
-  pointer-events: none;
-  z-index: 0;
-}
-
 img {
   display: block;
   max-width: 100%;
@@ -120,28 +105,10 @@ button {
   gap: var(--space-5);
 }
 
-.hero__logo {
-  width: 64px;
-  height: 64px;
-  /* WHY: el logo SICAM es azul sobre fondo transparente; sobre el gradiente azul
-     se pierde. Lo invertimos a blanco con un filtro CSS (sin tocar el PNG). */
-  filter: brightness(0) invert(1);
-  flex-shrink: 0;
-}
-
 .hero__text {
   display: flex;
   flex-direction: column;
   gap: var(--space-1);
-}
-
-.hero__eyebrow {
-  font-family: var(--font-body);
-  font-size: 0.8rem;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  opacity: 0.85;
 }
 
 .hero__title {
@@ -274,7 +241,7 @@ button {
 }
 
 /* WHY: la categoría es el filtro principal — la distinguimos solo con borde
-   y texto en azul SICAM. Misma altura, padding y radius que los demás
+   y texto en color de marca. Misma altura, padding y radius que los demás
    selects para que Tom Select se comporte igual en todos.
    width fijo (15rem) elimina el efecto "crece/encoge" al cambiar de opción
    y, de regalo, hace que el dropdown (que TomSelect dimensiona al ancho
@@ -422,21 +389,16 @@ table td.sub2     { background-color: var(--color-sub2);     color: white; font-
 /* =============================================================================
    Footer
    ============================================================================= */
+/* WHY: franja decorativa al final de la página. Sin contenido interno, el
+   padding es lo que le da altura visible. min-height garantiza que se vea
+   aunque cambien los tokens de spacing. */
 .footer {
   background: var(--color-brand-dark);
-  color: white;
-  text-align: center;
   padding: var(--space-4);
   margin-top: var(--space-6);
+  min-height: 4rem;
   position: relative;
   z-index: 1;
-}
-
-.footer p {
-  font-family: var(--font-heading);
-  font-size: 0.9rem;
-  font-weight: 600;
-  letter-spacing: 0.05em;
 }
 
 /* =============================================================================
@@ -448,11 +410,6 @@ table td.sub2     { background-color: var(--color-sub2);     color: white; font-
   .main {
     padding-left: var(--space-4);
     padding-right: var(--space-4);
-  }
-
-  .hero__logo {
-    width: 48px;
-    height: 48px;
   }
 
   /* WHY: en mobile la grid de 3 columnas se colapsa a una sola, todo apilado
@@ -488,7 +445,7 @@ table td.sub2     { background-color: var(--color-sub2);     color: white; font-
   font-family: var(--font-body);
 }
 
-/* Borde, radio y tamaño de texto en línea con la paleta SICAM. NO tocamos
+/* Borde, radio y tamaño de texto en línea con la paleta de marca. NO tocamos
    padding ni overflow. font-size 1rem porque el default del tema es 13px,
    que se queda corto frente al resto de la UI. */
 .ts-wrapper.single .ts-control {
@@ -562,7 +519,7 @@ table td.sub2     { background-color: var(--color-sub2);     color: white; font-
   color: white;
 }
 
-/* Variante primary (categoría): solo borde y texto en azul SICAM, todo lo
+/* Variante primary (categoría): solo borde y texto en azul de marca, todo lo
    demás idéntico a un select normal — Tom Select no tiene que pelear con
    nada raro. */
 .ts-wrapper.select--primary.single .ts-control {
