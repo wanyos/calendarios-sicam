@@ -70,5 +70,16 @@ export const getListaSubgrupoReduccion = (year, fechaInit, totalSecuencia) => {
 }
 
 
+// WHY: A→0, B→1, ..., Z→25. Sustituye los switches duplicados que vivían
+//      en cada FechasXxx.js. El charCode-65 vale para mayúsculas; minúsculas
+//      las sube a mayúsculas antes. Si la letra es vacía/null o no es A-Z,
+//      devuelve 0 (mismo comportamiento que el default de los switches).
+export const letraAIndice = (letra) => {
+    if (typeof letra !== 'string' || letra.length === 0) return 0;
+    const cc = letra.toUpperCase().charCodeAt(0);
+    return cc >= 65 && cc <= 90 ? cc - 65 : 0;
+};
+
+
 
 

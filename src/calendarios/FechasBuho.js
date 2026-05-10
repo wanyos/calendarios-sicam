@@ -1,5 +1,5 @@
 
-import {getFechaInit, getListaLibres, getListaSubgrupo, getListaSubgrupoReduccion} from './FuncionesComunes.js';
+import {getFechaInit, getListaLibres, getListaSubgrupo, getListaSubgrupoReduccion, letraAIndice} from './FuncionesComunes.js';
 
 export function getListaLibresBuho(year, grupo){
     let fechaInitGrupo1_2022 = new Date(2022,0,4);
@@ -54,30 +54,17 @@ export function getListaSubgrupoBuho(year, grupo, subgrupo){
 }
 
 function getFechaSubgrupo2022(grupo, subgrupo) {
-    const posLetra = getPosSubgrupo(subgrupo);
+    const posLetra = letraAIndice(subgrupo);
     if (grupo >= 1 && grupo <= 5) {
         return subgrupos[grupo - 1][posLetra];
     }
     return subgrupos[grupo - 1][0];
 }
 
-
-function getPosSubgrupo(subgrupo) {
-    let pos;   
-    switch(subgrupo){
-        case "B": pos = 1; break;
-        case "C": pos = 2; break;
-        case "D": pos = 3; break;
-        case "E": pos = 4; break;
-        case "F": pos = 5; break;
-        case "G": pos = 6; break;
-        case "H": pos = 7; break;
-        default: pos = 0; break;
-     }
-    return pos;
-}
-
-//miercoles = 0, domingo = 1, martes = 2, lunes =1
+// WHY: mapea el día de la semana de fechaInit a la posición de la secuencia
+//      [60, 65, 76, 79]. La secuencia está ordenada miércoles, domingo,
+//      martes, lunes (posiciones 0..3). Cualquier otro día cae en pos 0.
+//      day = JS getDay() (domingo=0, lunes=1, ..., sábado=6).
 function getPosSecuencia(fechaInit) {
     let pos = 0;
     const day = fechaInit.getDay();

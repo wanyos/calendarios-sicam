@@ -1,5 +1,6 @@
 
 import {getLibresConductorInspector, getListaSubgrupoConductorInspector, getListaSubComunesConductorInspector} from './FechasConductorInspector.js';
+import {letraAIndice} from './FuncionesComunes.js';
 
 export function getListaLibresInspectorNoche(year, grupo) {
     const fechaInitGrupo1_2022 = new Date(2022, 0, 4);
@@ -42,28 +43,11 @@ export function getListaLibresInspectorNoche(year, grupo) {
 
 
         function getFechaSubgrupo2022(grupo, subgrupo) {
-            const pos = getNumeroSubgrupo(subgrupo);
+            const pos = letraAIndice(subgrupo);
             if(grupo >= 1 && grupo <= 5){
-                return subgrupos[grupo-1][pos];      
+                return subgrupos[grupo-1][pos];
             }
             return subgrupos[grupo-1][0];
-        }
-
-        function getNumeroSubgrupo(subgrupo) {
-            let pos;   
-            switch(subgrupo){
-                case "B": pos = 1; break;
-                case "C": pos = 2; break;
-                case "D": pos = 3; break;
-                case "E": pos = 4; break;
-                case "F": pos = 5; break;
-                case "G": pos = 6; break;
-                case "H": pos = 7; break;
-                case "I": pos = 8; break;
-                case "J": pos = 9; break;
-                default: pos = 0; break;
-             }
-            return pos;
         }
 
 

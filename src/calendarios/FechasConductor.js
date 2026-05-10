@@ -1,6 +1,7 @@
 
 
 import {getLibresConductorInspector, getListaSubgrupoConductorInspector, getListaSubComunesConductorInspector} from './FechasConductorInspector.js';
+import {letraAIndice} from './FuncionesComunes.js';
 
 export function getListaLibresConductor(year, grupo) {
     const fechaInitGrupo1_2020 = new Date(2020, 0, 1);
@@ -38,26 +39,11 @@ export function getListaSubgrupoConductor(year, grupo, subgrupo) {
 
 
 function getFechaSubgrupo2020(grupo, subgrupo) {
-    const pos = getNumeroSubgrupo(subgrupo);
+    const pos = letraAIndice(subgrupo);
     if(grupo >= 1 && grupo <= 5){
-        return subgrupos[grupo-1][pos];      
+        return subgrupos[grupo-1][pos];
     }
     return subgrupos[grupo-1][0];
-}
-
-function getNumeroSubgrupo(subgrupo) {
-    let pos;   
-    switch(subgrupo){
-        case "B": pos = 1; break;
-        case "C": pos = 2; break;
-        case "D": pos = 3; break;
-        case "E": pos = 4; break;
-        case "F": pos = 5; break;
-        case "G": pos = 6; break;
-        case "H": pos = 7; break;
-        default: pos = 0; break;
-     }
-    return pos;
 }
 
 /**

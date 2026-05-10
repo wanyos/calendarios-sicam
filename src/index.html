@@ -80,11 +80,15 @@
     <main class="main">
       <!-- WHY: la leyenda pasa de aside vertical a chips horizontales — fija el descentrado
            y deja todo el ancho del main para la grid de cards de meses. -->
+      <!-- WHY: data-rol identifica cada rótulo de forma estable. initRotulos
+           los busca por data-rol con querySelector — antes dependía de la
+           posición exacta (firstElementChild, nextElementSibling), lo que
+           rompía silenciosamente si alguien reordenaba el HTML. -->
       <div id="rotulos-subgrupo" class="rotulos">
-        <h4 class="libres">Libre</h4>
-        <h4 class="subgrupo">Subgrupo</h4>
-        <h4 class="sub1">Grupo(A/C/E/G)</h4>
-        <h4 class="sub2">Grupo(B/D/F/H)</h4>
+        <h4 data-rol="libre" class="libres">Libre</h4>
+        <h4 data-rol="subgrupo" class="subgrupo">Subgrupo</h4>
+        <h4 data-rol="sub1" class="sub1">Grupo(A/C/E/G)</h4>
+        <h4 data-rol="sub2" class="sub2">Grupo(B/D/F/H)</h4>
       </div>
 
       <div id="container-tabla" class="container-tabla"></div>

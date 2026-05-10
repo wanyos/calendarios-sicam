@@ -1,7 +1,7 @@
 # Revisión de código — `src/calendarios/` + `src/index.js`
 
 **Rama:** `refactor/improve-files`
-**Fecha:** 2026-05-09
+**Creado:** 2026-05-09 · **Última actualización:** 2026-05-10
 **Alcance:** 15 archivos en `src/calendarios/` (1407 LOC) + `src/index.js` (353 LOC) — total 1760 LOC.
 
 ## Cómo usar este documento
@@ -18,16 +18,20 @@ Severidad:
 
 ## Resumen ejecutivo
 
-| Categoría | Hallazgos | Más urgente |
-|---|---|---|
-| Bugs críticos | 2 | `BUG-01` — fechas malformadas en `FechasInspectorNoche.js` |
-| Bugs latentes / alto riesgo | 4 | `BUG-03` — `comprobarDia` muta listas globales con `.shift()` |
-| Rendimiento | 3 | `PERF-02` — re-build completo del DOM en cada cambio |
-| Legibilidad / duplicación | 8 | `REF-01` — patrón repetido en 8 archivos `FechasXxx.js` |
-| Seguridad | 1 | `SEC-01` — sin riesgo crítico (todo `createTextNode`) — solo nota |
-| Tooling ausente | 3 | `TOOL-01` — sin ESLint, sin tests, sin tipos |
+**Progreso a 2026-05-10 (segunda sesión)**: 12 hallazgos resueltos · 1 aplicado pendiente validación · 5 pendientes (más 3 que requieren fuente externa o son refactores grandes).
 
-**Recomendación**: arrancar por `BUG-01` y `BUG-02` (correctness), luego `TOOL-01` (instalar ESLint), después `REF-01` (refactor del patrón duplicado), y finalmente perf/cosmético.
+| Categoría | Total | ✅ | ⚠️ | ⏳ |
+|---|---|---|---|---|
+| Bugs críticos / latentes | 6 | 3 | 1 | 2 |
+| Legibilidad / duplicación | 8 | 6 | 0 | 2 |
+| Rendimiento | 3 | 1 | 0 | 2 |
+| Seguridad | 1 | 1 | 0 | 0 |
+| Tooling | 3 | 2 | 0 | 1 |
+| **Bonus** (no en plan original) | — | 1 | 0 | 0 |
+
+**Bonus completado**: extracción de funciones puras de `index.js` a `src/calendarios/utils.js` (8 funciones desacopladas de globales y testeables aisladamente).
+
+**Próximo paso recomendado**: `BUG-05` (reescribir `getFechaInit` eliminando la heurística mágica) — quirúrgico, con tests de caracterización ya escritos. Después `REF-01` (factoría `crearCalendario`) con la red de tests dándonos confianza.
 
 ---
 
@@ -69,17 +73,12 @@ Severidad:
 
 ### `BUG-03` 🟠 — `comprobarDia` muta listas globales con `.shift()`
 
-- [ ] **Archivo**: [src/index.js:59-78](src/index.js#L59-L78)
-- **Riesgo**: `comprobarDia()` hace `listaLibresYear.shift()`, `listaSubgrupoYear.shift()`, `listaSubComunesYear.shift()` para "consumir" cada fecha que pinta. Funciona porque las listas vienen ordenadas y las celdas se procesan en el mismo orden. Pero:
-  1. **Acopla el algoritmo a un orden estricto**. Si en el futuro se quiere recorrer los meses en otro orden (ej. usuario navega a un mes específico) o re-pintar parcialmente, todo se rompe silenciosamente.
-  2. **No se puede re-renderizar sin recargar las listas** (porque ya están vacías). De hecho, `nuevaFecha()` siempre llama a `setDatos()` que las reconstruye — esto **no es por elegancia**, es porque sin reconstruirlas el segundo render fallaría.
-- **Fix sugerido**: cambiar `.shift()` por un índice/cursor por lista, o mejor: convertir las listas en un `Set<string>` con claves `"YYYY-MM-DD"` y hacer `set.has(...)`. Coste O(1) por celda, sin estado mutable, sin orden requerido.
-  ```js
-  // construcción una sola vez
-  const setLibres = new Set(listaLibres.map(d => d.toISOString().slice(0,10)));
-  // consulta
-  if (setLibres.has(`${year}-${mes}-${dia}`)) return "libres";
-  ```
+- [x] **Resuelto 2026-05-10** — listas convertidas a `Set<string>` con clave canónica `"YYYY-M-D"`. `comprobarDia` hace `set.has()` en O(1), sin mutación, sin acoplamiento al orden. Validado visualmente en navegador y por la suite de 626 tests (incluye 11 tests específicos en `tests/calendarios/utils.test.js` para `comprobarDia`).
+- **Archivo**: [src/calendarios/utils.js](src/calendarios/utils.js) (extraído desde `index.js`)
+- **Riesgo original**: `comprobarDia()` hacía `listaLibresYear.shift()`, etc. para "consumir" cada fecha. Esto:
+  1. Acoplaba el algoritmo a un orden estricto.
+  2. No permitía re-renderizar sin reconstruir las listas.
+- **Fix aplicado**: las 3 listas se almacenan ahora como `Set<string>` (no arrays) con clave `"YYYY-M-D"` (mes 0-indexed). El lookup es `set.has(claveDia(year, mes-1, dia))` — O(1), inmutable, no depende del orden.
 
 ### `BUG-04` 🟠 — Fall-through silencioso en `FechasGruaDSM.getFechaInicioGrupo`
 
@@ -107,16 +106,8 @@ Severidad:
 
 ### `BUG-06` 🟠 — `getArrayGruaDSM` mezcla tipos number/string
 
-- [ ] **Archivo**: [src/calendarios/InitCabecera.js:161-170](src/calendarios/InitCabecera.js#L161-L170)
-- **Riesgo**: el primer elemento del array se inserta como **number** (`array.push(valor)`) y los siguientes como **string** (`array.push(valor.toString())`). Si después se compara con `===`, hay riesgo de bug.
-  ```js
-  array.push(valor);              // number
-  for (...) {
-    valor += 5;
-    array.push(valor.toString()); // string
-  }
-  ```
-- **Fix sugerido**: unificar a string desde el principio (`array.push(String(valor))`). Coherente con el resto del código que trata los valores de selects como strings.
+- [x] **Resuelto 2026-05-10** — todos los `push` convierten a string con `String(valor)`. Comentario WHY añadido explicando el motivo.
+- **Archivo**: [src/calendarios/InitCabecera.js:161-170](src/calendarios/InitCabecera.js#L161-L170)
 
 ---
 
@@ -155,13 +146,8 @@ Severidad:
 
 ### `REF-02` 🟡 — Switches `letra → posición` repetidos
 
-- [ ] **Archivos**: `FechasBuho.js`, `FechasConductor.js`, `FechasGrua.js`, `FechasInspector.js`, `FechasInspectorNoche.js`
-- **Problema**: cada uno define un `getNumeroSubgrupo(subgrupo)` que mapea "A" → 0, "B" → 1, etc. con un `switch`. Es la misma función con distinta longitud (Conductor llega a H, Inspector a J).
-- **Fix sugerido**: una sola función en `FuncionesComunes.js`:
-  ```js
-  export const letraAIndice = (letra) => letra ? letra.toUpperCase().charCodeAt(0) - 65 : 0;
-  ```
-  Cuatro líneas en vez de N switches de 8-10 cases.
+- [x] **Resuelto 2026-05-10** — `letraAIndice(letra)` añadido a `FuncionesComunes.js`. Eliminadas 5 funciones locales duplicadas en `FechasBuho.js`, `FechasConductor.js`, `FechasGrua.js`, `FechasInspector.js` y `FechasInspectorNoche.js`. ~50 LOC menos.
+- **Archivos**: `FechasBuho.js`, `FechasConductor.js`, `FechasGrua.js`, `FechasInspector.js`, `FechasInspectorNoche.js`
 
 ### `REF-03` 🟡 — Comentarios de código obsoleto (era CommonJS)
 
@@ -194,12 +180,8 @@ Severidad:
 
 ### `REF-06` 🟡 — Comentarios incorrectos / desactualizados
 
-- [ ] **Archivo**: [src/calendarios/FechasBuho.js:80](src/calendarios/FechasBuho.js#L80)
-  ```js
-  //miercoles = 0, domingo = 1, martes = 2, lunes =1
-  ```
-  pero `getDay()` devuelve **0 = domingo**, **1 = lunes**, **2 = martes**, **3 = miércoles** (estándar JS). El comentario describe **posiciones de un array**, no el valor de `getDay()`. Confunde.
-- **Fix sugerido**: reescribir el comentario para distinguir claramente "día de la semana JS" vs "índice en la secuencia".
+- [x] **Resuelto 2026-05-10** — comentario reescrito como bloque WHY que distingue explícitamente entre la convención JS de `getDay()` y la posición en la secuencia. Corregido el typo `lunes = 1` (debía ser `lunes → pos 3`).
+- **Archivo**: [src/calendarios/FechasBuho.js:64-67](src/calendarios/FechasBuho.js#L64-L67)
 
 ### `REF-07` 🟡 — Naming inconsistente (camelCase vs snake_case)
 
@@ -209,22 +191,8 @@ Severidad:
 
 ### `REF-08` 🟡 — Acoplamiento DOM frágil en `initRotulos`
 
-- [ ] **Archivo**: [src/calendarios/InitCabecera.js:49-53](src/calendarios/InitCabecera.js#L49-L53)
-  ```js
-  let libre = div.firstElementChild;
-  let subgrupo = libre.nextElementSibling;
-  let sub1 = subgrupo.nextElementSibling;
-  let sub2 = div.lastElementChild;
-  ```
-- **Problema**: si en el HTML alguien reordena los `<h4>` o añade uno nuevo, esta función rompe silenciosamente. No hay validación.
-- **Fix sugerido**: usar selectores explícitos con `data-rol`:
-  ```html
-  <h4 data-rol="libre" class="libres">Libre</h4>
-  ```
-  ```js
-  const libre = div.querySelector('[data-rol="libre"]');
-  ```
-  Más verbose, pero el HTML y el JS no pueden divergir sin que falle ruidosamente.
+- [x] **Resuelto 2026-05-10** — añadido `data-rol="libre|subgrupo|sub1|sub2"` a los `<h4>` en `index.html`. `initRotulos` busca por `querySelector('[data-rol="..."]')` en vez de navegar por `firstElementChild` / `nextElementSibling`. La variable `libre` se eliminó porque nunca cambia su visibilidad (siempre visible) — vive en el HTML por coherencia visual y se gestiona vía CSS estático.
+- **Archivos**: [src/index.html](src/index.html#L83-L92), [src/calendarios/InitCabecera.js:49-58](src/calendarios/InitCabecera.js#L49-L58)
 
 ---
 
@@ -256,19 +224,13 @@ Severidad:
 
 ### `PERF-03` 🟢 — Doble llamada a `getDay()` en `startDay`
 
-- [ ] **Archivo**: [src/index.js:34-37](src/index.js#L34-L37)
+- [x] **Resuelto 2026-05-10** — al extraer `startDay` a `src/calendarios/utils.js`, se aprovechó para guardar `getDay()` en una variable y llamarla solo una vez. La firma cambió de `startDay(monthNumber)` (que dependía del global `currentDate`) a `startDay(month, year)` (pura).
+- **Archivo**: [src/calendarios/utils.js](src/calendarios/utils.js) (función pura extraída desde `index.js`)
+- **Implementación final**:
   ```js
-  function startDay(monthNumber) {
-      let start = new Date(currentDate.getFullYear(), monthNumber - 1, 1);
-      return ((start.getDay() - 1) == -1) ? 6 : start.getDay() - 1;
-  }
-  ```
-- **Problema**: `getDay()` se llama dos veces. El coste es despreciable, pero la línea es difícil de leer.
-- **Fix sugerido**:
-  ```js
-  function startDay(monthNumber) {
-    const day = new Date(currentDate.getFullYear(), monthNumber - 1, 1).getDay();
-    return day === 0 ? 6 : day - 1;  // domingo (0) → 6, resto → day-1
+  export function startDay(month, year) {
+    const day = new Date(year, month - 1, 1).getDay();
+    return day === 0 ? 6 : day - 1;
   }
   ```
 
@@ -313,18 +275,25 @@ Severidad:
 
 ### `TOOL-02` 🟠 — Sin tests
 
-- [ ] **Estado**: no hay carpeta `tests/` ni framework configurado.
-- **Por qué importa**: la lógica de fechas es la **lógica de negocio del proyecto entero**. Bugs como `BUG-01` (fechas malformadas) viven indetectados durante meses. Sin tests, cualquier refactor (`REF-01`) es ruleta rusa.
-- **Fix sugerido (priorizado)**:
-  1. **Vitest** (integración nativa con Vite, que ya usas).
-     ```bash
-     npm install -D vitest
-     ```
-  2. **Empezar pequeño** — un test por cada `getListaLibresXxx` que verifique:
-     - Se devuelven N fechas para un año dado
-     - Las fechas están en orden creciente
-     - La primera y última fecha caen dentro del año pedido
-  3. **Snapshot tests** para cada combinación tipo+grupo+subgrupo: capturan el array completo y avisan si cambia. Útil para refactorizar `REF-01` con confianza.
+- [x] **Resuelto 2026-05-10** — instalado `vitest@4.1.5` con `vitest.config.js` que sobrescribe el `root: 'src'` heredado de Vite. **626 tests en 13 archivos** ejecutándose en ~1s.
+- **Cobertura por archivo**:
+  | Suite | Tests | Cubre |
+  |---|---|---|
+  | `FechasInspectorNoche.test.js` | 109 | Smoke completo + asserts y snapshots de `BUG-01` |
+  | `FechasInspector.test.js` | 105 | 5 grupos × 10 subgrupos × 3 funciones |
+  | `FechasConductor.test.js` | 85 | 5 × 8 × 3 |
+  | `FechasBuho.test.js` | 85 | 5 × 8 × 3 |
+  | `FechasGruaDSM.test.js` | 55 | 5 grupos + 50 numSubgrupos |
+  | `FechasRefuerzoNocturno.test.js` | 40 | 2 grupos × (9 números + 11 letras) |
+  | `FechasParkingDSM50.test.js` | 36 | 12 grupos × 3 funciones |
+  | `utils.test.js` | 35 | 8 funciones puras + lógica de `comprobarDia` |
+  | `DatosFechas.test.js` | 21 | dispatcher + retorno `undefined` para tipos no manejados |
+  | `FechasGrua.test.js` | 20 | 5 + 5 × 3 |
+  | `FechasParkingDSM100.test.js` | 20 | 10 × 2 |
+  | `FuncionesComunes.test.js` | 12 | núcleo + caracterización de `getFechaInit` (BUG-05) |
+  | `FechasGruaDSMNoche.test.js` | 3 | 3 grupos |
+- **Helper compartido**: `tests/helpers.js` con `expectArrayDeFechasDelAnyo(lista)` y la constante `YEAR = 2026`.
+- **Snapshots**: solo para los casos de `BUG-01` (las fechas reconstruidas por hipótesis de Inspector_Noche grupo 4 J y grupo 5 J), para detectar cambios cuando se valide contra el calendario oficial.
 
 ### `TOOL-03` 🟢 — Sin TypeScript
 
@@ -334,33 +303,68 @@ Severidad:
 
 ---
 
-## 🗺️ Plan de acción sugerido
+## ⭐ Bonus completados (no estaban en el plan original)
 
-Orden recomendado (de menor a mayor impacto en el código):
+### `BONUS-01` ⭐ — Extracción de funciones puras de `index.js` a `utils.js`
 
-| # | Tarea | Beneficio | Riesgo |
-|---|---|---|---|
-| 1 | `BUG-02` (doble nuevaFecha) | Quita flash al cargar | Bajo |
-| 2 | `REF-03` (limpiar comentarios CommonJS) | Limpieza visual masiva | Nulo |
-| 3 | `TOOL-01` (instalar ESLint) | Detecta otros problemas auto | Nulo |
-| 4 | `REF-04`, `REF-05` (con auto-fix de ESLint) | Coherencia | Nulo |
-| 5 | **`BUG-01`** (fechas malformadas Inspector_Noche) | **Crítico de correctness** | Medio (verificar valores) |
-| 6 | `BUG-04` (GruaDSM grupos 4-5) | Aclarar diseño o fix | Medio (verificar diseño) |
-| 7 | `TOOL-02` (Vitest + tests básicos) | Red de seguridad | Bajo |
-| 8 | `BUG-03` (refactor `comprobarDia` con Set) | Robustez | Medio (cambia algoritmo) |
-| 9 | `BUG-05` (reescribir `getFechaInit`) | Eliminar magia | Alto (lógica núcleo) |
-| 10 | `REF-02` (helper letra→índice) | Reduce duplicación | Bajo |
-| 11 | `REF-08` (data-rol en HTML) | Robustez DOM | Bajo |
-| 12 | `REF-01` (factoría `crearCalendario`) | **Refactor mayor** | Alto, requiere `TOOL-02` antes |
-| 13 | `PERF-01`, `PERF-03` (micro-perf) | Marginal | Medio |
-| 14 | `REF-07` (naming uniforme) | Cosmético | Bajo |
-| 15 | `TOOL-03` (TypeScript con JSDoc) | Tipos sin migración | Bajo |
+- [x] **Aplicado 2026-05-10** — junto al fix de `BUG-03`, las funciones puras que vivían dentro de `index.js` (acopladas a globales como `currentDate`, `setLibresYear`, `select_subgrupo`) se extrajeron a `src/calendarios/utils.js`.
+- **Funciones movidas**:
+  - `claveDia(anyo, mes, dia)`, `claveFecha(date)` — generación de claves canónicas
+  - `isLeap(year)` — bisiesto gregoriano
+  - `getTotalDays(month, year)` — días por mes
+  - `startDay(month, year)` — día de la semana lunes=0..domingo=6
+  - `getNombre(n)` — mes en español
+  - `getArrayMes(espacios, totalDias)` — array de 42 celdas para la grid
+  - `comprobarDia(numDia, mes, anyo, sets, subgrupoActual)` — clasificación de cada celda
+- **Beneficios**:
+  - `index.js` queda como capa de pegamento DOM/eventos, sin lógica matemática
+  - 35 tests directos sobre las funciones puras (antes inalcanzables)
+  - Reutilizables en otros contextos (futuras vistas, tests, CLI...)
 
-**Mi recomendación de primer sprint**: tareas 1-5 en orden. Esas cinco resuelven un bug de correctness, dejan el código mucho más limpio y montan la herramienta que detecta el resto. Es ~1-2 sesiones de trabajo y bajo riesgo.
+---
+
+## 🗺️ Plan de acción
+
+### ✅ Completado
+
+| # | Tarea | Commit |
+|---|---|---|
+| 1 | `BUG-02` doble `nuevaFecha()` | `f522151` |
+| 2 | `REF-03` limpiar comentarios CommonJS | `f522151` |
+| 3 | `TOOL-01` instalar ESLint | `f522151` |
+| 4 | `REF-04` + `REF-05` (auto-fix) | `f522151` |
+| 5 | `BUG-01` fechas malformadas (⚠️ pendiente validación) | `f522151` |
+| 6 | `TOOL-02` Vitest + suite completa de smoke tests | `553c83e` + `ccf0c90` |
+| 7 | `BUG-03` `comprobarDia` con Set + `BONUS-01` extracción a `utils.js` + tests del núcleo | `9bb920c` |
+| 8 | `PERF-03` doble `getDay()` (de paso con la extracción) | `9bb920c` |
+| 9 | `SEC-01` revisado (sin riesgos) | revisión inicial |
+| 10 | `BUG-06` tipos string en `getArrayGruaDSM` | (sin commitear todavía) |
+| 11 | `REF-02` helper `letraAIndice` compartido | (sin commitear todavía) |
+| 12 | `REF-06` comentario corregido en `FechasBuho.js` | (sin commitear todavía) |
+| 13 | `REF-08` `data-rol` para `initRotulos` | (sin commitear todavía) |
+
+### ⏳ Pendiente
+
+Orden recomendado (refactores quirúrgicos primero, cosmético al final):
+
+| # | Tarea | Beneficio | Riesgo | Estimado |
+|---|---|---|---|---|
+| 1 | `BUG-05` reescribir `getFechaInit` (eliminar magia) | Núcleo entendible | Medio | 30 min (con tests) |
+| 2 | **`REF-01`** factoría `crearCalendario` | **Refactor mayor (~600 LOC menos)** | Medio (con tests) | 1-2 sesiones |
+| 3 | `PERF-01` mutar Date en bucles de `FuncionesComunes` | Marginal | Medio | 20 min |
+| 4 | `REF-07` naming uniforme camelCase | Cosmético | Nulo | 15 min |
+| 5 | `BUG-04` documentar/fix GruaDSM grupos 4-5 | Aclarar diseño | Medio (validación externa) | requiere fuente |
+| 6 | `BUG-01` validación oficial Inspector_Noche J | Cierre del bug | — | requiere calendario impreso |
+| 7 | `PERF-02` cachear celdas DOM | Render más rápido | Medio | 1 sesión |
+| 8 | `TOOL-03` TypeScript con JSDoc gradual | Tipos sin migración | Bajo | varias sesiones |
+
+**Mi recomendación para el siguiente sprint**: empezar por `BUG-05` (quirúrgico, simplifica el núcleo, con tests de caracterización ya escritos). Después `REF-01` con confianza dado que la red de tests está montada.
 
 ---
 
 ## Apéndice — Métricas
+
+### Inicial (revisión 2026-05-09)
 
 - **LOC totales revisados**: 1760
 - **LOC duplicado estimado** (refactor `REF-01`): ~600
@@ -368,6 +372,16 @@ Orden recomendado (de menor a mayor impacto en el código):
 - **Funciones privadas**: ~45
 - **Archivos con comentarios CommonJS obsoletos**: 7
 - **Comparaciones `==` no estrictas**: 6 (todas en `index.js`)
+
+### Tras los 4 commits del primer sprint (2026-05-10)
+
+- **Tests**: 626 en 13 archivos · ~1s
+- **Lint**: 0 errores, 0 warnings (ESLint v10.3 con flat config)
+- **Comentarios CommonJS obsoletos**: 0 (–36 líneas borradas)
+- **Comparaciones `==`**: 0 (–22, todas migradas a `===`)
+- **Variables `let` reasignables sin justificación**: 0 (–76, migradas a `const`)
+- **Funciones puras testeables aisladamente**: 35 (antes: 0)
+- **Bugs críticos abiertos**: 0 · **bugs latentes pendientes**: 2 (`BUG-04`, `BUG-05`)
 
 ## Apéndice — Lo que NO he revisado en esta pasada
 

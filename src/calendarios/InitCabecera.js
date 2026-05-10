@@ -47,10 +47,17 @@ export function initSelectSubgrupo(tipoCalendario, select, select_value) {
 
 
 export function initRotulos(tipoCalendario, div) {
-    const libre = div.firstElementChild;
-    const subgrupo = libre.nextElementSibling;
-    const sub1 = subgrupo.nextElementSibling;
-    const sub2 = div.lastElementChild;
+    // WHY: buscamos por data-rol en vez de por posición (firstElementChild,
+    //      nextElementSibling). Si el HTML cambia el orden de los <h4>,
+    //      antes la función seguía funcionando pero pintaba en el sitio
+    //      equivocado. Con data-rol falla ruidosamente con un TypeError
+    //      si se borra el atributo, lo cual es preferible.
+    //      "libre" no se referencia desde aquí porque nunca cambia su
+    //      visibilidad (es siempre visible). Lo dejamos en el HTML para
+    //      coherencia visual y se gestiona vía CSS estático.
+    const subgrupo = div.querySelector('[data-rol="subgrupo"]');
+    const sub1 = div.querySelector('[data-rol="sub1"]');
+    const sub2 = div.querySelector('[data-rol="sub2"]');
 
     if(tipoCalendario === 'Conductor' || tipoCalendario === 'Buho'){
         subgrupo.style.display = "block";
@@ -159,12 +166,15 @@ function setDatosSelect(select, array) {
  * @param {*} select_value 
  */
 function getArrayGruaDSM(select_value) {
+    // WHY: todos los push convierten a string para mantener tipo uniforme.
+    //      Antes el primer elemento entraba como number y los demás como
+    //      string — luego cualquier comparación con === podía fallar.
     const array = [];
     let valor = parseInt(select_value);
-    array.push(valor); //hay que incluir como primer número el mismo que el grupo
+    array.push(String(valor));
     for (let a = 0; a < 9; a++) {
         valor += 5;
-        array.push(valor.toString());
+        array.push(String(valor));
     }
     return array;
 }
