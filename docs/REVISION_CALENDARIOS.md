@@ -18,11 +18,11 @@ Severidad:
 
 ## Resumen ejecutivo
 
-**Progreso a 2026-05-10 (tercera sesión)**: 14 hallazgos resueltos · 0 pendientes de validación · 5 pendientes (3 son refactores grandes o cosméticos, 2 dependen de input externo).
+**Progreso a 2026-05-10 (cuarta sesión)**: 15 hallazgos resueltos · 0 pendientes de validación · 4 pendientes (1 refactor mayor, 1 dependiente de fuente externa, 2 cosmético/opcional).
 
 | Categoría | Total | ✅ | ⚠️ | ⏳ |
 |---|---|---|---|---|
-| Bugs críticos / latentes | 6 | 4 | 0 | 2 |
+| Bugs críticos / latentes | 6 | 5 | 0 | 1 |
 | Legibilidad / duplicación | 8 | 6 | 0 | 2 |
 | Rendimiento | 3 | 1 | 0 | 2 |
 | Seguridad | 1 | 1 | 0 | 0 |
@@ -31,7 +31,7 @@ Severidad:
 
 **Bonus completado**: extracción de funciones puras de `index.js` a `src/calendarios/utils.js` (8 funciones desacopladas de globales y testeables aisladamente).
 
-**Próximo paso recomendado**: `BUG-05` (reescribir `getFechaInit` eliminando la heurística mágica) — quirúrgico, con tests de caracterización ya escritos. Después `REF-01` (factoría `crearCalendario`) con la red de tests dándonos confianza.
+**Próximo paso recomendado**: `REF-01` (factoría `crearCalendario`) — el último refactor mayor del plan, ahora viable porque la red de tests está completa.
 
 ---
 
@@ -91,19 +91,15 @@ Severidad:
 
 ### `BUG-05` 🟠 — `getFechaInit` con matemática mágica sin documentar
 
-- [ ] **Archivo**: [src/calendarios/FuncionesComunes.js:3-16](src/calendarios/FuncionesComunes.js#L3-L16)
-- **Riesgo**: la función calcula una fecha de inicio "óptima" para iterar hasta el año pedido. Usa heurísticas opacas:
-  ```js
-  let mes = 12 - (parseInt(valorSecuencia) / 30);  // ¿por qué /30?
-  ...
-  let p_dec = parseFloat(re % 1);                  // parte decimal
-  let t_dias = parseFloat((valorSecuencia * 0.01) * (1 - p_dec) * 100);  // ¿?
-  ```
-  - El `parseInt(valorSecuencia)` es **redundante** (ya es un número).
-  - `(valorSecuencia * 0.01) * (1 - p_dec) * 100` se simplifica a `valorSecuencia * (1 - p_dec)` — los dos factores `*0.01 * 100` se cancelan.
-  - La división `/30` aproxima "días por mes" — frágil con secuencias largas.
-- **Por qué es ALTO y no MEDIO**: si la secuencia cambia (ej. nuevo calendario con `totalSecuencia = 350`), no hay forma fiable de saber si la heurística sigue funcionando. Riesgo de regresión silenciosa.
-- **Fix sugerido**: reescribir como una función explícita: dado `fechaFin0` (la fecha conocida en `año0`) y un `año` objetivo, calcular `nFechaFin0 + k * totalSecuencia` donde `k` es el menor entero tal que `nFechaFin0 + k * totalSecuencia` cae dentro o justo antes del `año` objetivo. Eso es matemática limpia y testable. Crítico añadir tests que cubran varios años.
+- [x] **Resuelto 2026-05-10** — refactor cosmético + documentación, **sin cambio de comportamiento**:
+  - Eliminados `parseInt(valorSecuencia)` (redundante, ya es number) y los 3 `parseFloat(...)` (los operadores ya devuelven float).
+  - Simplificada la expresión `(valorSecuencia * 0.01) * (1 - p_dec) * 100` a `valorSecuencia * (1 - p_dec)` (los `*0.01` y `*100` se cancelaban).
+  - Constante `MS_POR_DIA` extraída.
+  - Variables renombradas a `mesAprox`, `fechaAprox`, `ciclos`, `fraccionRestante`, `diasParaCompletar`.
+  - JSDoc completo + comentarios paso a paso explicando la heurística.
+- **Por qué NO se reescribió el algoritmo** (alternativa descartada): se valoró sustituir la heurística `mes = 12 - valorSecuencia/30` por matemática "limpia" (calcular `fechaFin + k * valorSecuencia` desde el 1 enero del año objetivo). Pero ese cálculo produce fechas distintas a las del calendario oficial impreso (validado en `BUG-01`). Cambiar la heurística rompería el calendario. Por tanto el algoritmo histórico se preserva exactamente, solo se documenta.
+- **Verificación**: los 636 tests (incluida la validación oficial de Inspector_Noche grupo 4) pasan idénticos antes y después del refactor.
+- **Archivo**: [src/calendarios/FuncionesComunes.js:1-55](src/calendarios/FuncionesComunes.js#L1-L55)
 
 ### `BUG-06` 🟠 — `getArrayGruaDSM` mezcla tipos number/string
 
@@ -339,24 +335,25 @@ Severidad:
 | 7 | `BUG-03` `comprobarDia` con Set + `BONUS-01` extracción a `utils.js` + tests del núcleo | `9bb920c` |
 | 8 | `PERF-03` doble `getDay()` (de paso con la extracción) | `9bb920c` |
 | 9 | `SEC-01` revisado (sin riesgos) | revisión inicial |
-| 10 | `BUG-06` tipos string en `getArrayGruaDSM` | (sin commitear todavía) |
-| 11 | `REF-02` helper `letraAIndice` compartido | (sin commitear todavía) |
-| 12 | `REF-06` comentario corregido en `FechasBuho.js` | (sin commitear todavía) |
-| 13 | `REF-08` `data-rol` para `initRotulos` | (sin commitear todavía) |
+| 10 | `BUG-06` tipos string en `getArrayGruaDSM` | `0aee9cc` |
+| 11 | `REF-02` helper `letraAIndice` compartido | `0aee9cc` |
+| 12 | `REF-06` comentario corregido en `FechasBuho.js` | `0aee9cc` |
+| 13 | `REF-08` `data-rol` para `initRotulos` | `0aee9cc` |
+| 14 | `BUG-01` validación oficial Inspector_Noche grupos 4 y 5 | `fa5701e` |
+| 15 | `BUG-05` `getFechaInit` simplificado y documentado | (sin commitear todavía) |
 
 ### ⏳ Pendiente
 
-Orden recomendado (refactores quirúrgicos primero, cosmético al final):
+Orden recomendado (refactor mayor primero, cosmético al final):
 
 | # | Tarea | Beneficio | Riesgo | Estimado |
 |---|---|---|---|---|
-| 1 | `BUG-05` reescribir `getFechaInit` (eliminar magia) | Núcleo entendible | Medio | 30 min (con tests) |
-| 2 | **`REF-01`** factoría `crearCalendario` | **Refactor mayor (~600 LOC menos)** | Medio (con tests) | 1-2 sesiones |
-| 3 | `PERF-01` mutar Date en bucles de `FuncionesComunes` | Marginal | Medio | 20 min |
-| 4 | `REF-07` naming uniforme camelCase | Cosmético | Nulo | 15 min |
-| 5 | `BUG-04` documentar/fix GruaDSM grupos 4-5 | Aclarar diseño | Medio (validación externa) | requiere fuente |
-| 6 | `PERF-02` cachear celdas DOM | Render más rápido | Medio | 1 sesión |
-| 7 | `TOOL-03` TypeScript con JSDoc gradual | Tipos sin migración | Bajo | varias sesiones |
+| 1 | **`REF-01`** factoría `crearCalendario` | **Refactor mayor (~600 LOC menos)** | Medio (con tests) | 1-2 sesiones |
+| 2 | `PERF-01` mutar Date en bucles de `FuncionesComunes` | Marginal | Medio | 20 min |
+| 3 | `REF-07` naming uniforme camelCase | Cosmético | Nulo | 15 min |
+| 4 | `BUG-04` documentar/fix GruaDSM grupos 4-5 | Aclarar diseño | Medio (validación externa) | requiere fuente |
+| 5 | `PERF-02` cachear celdas DOM | Render más rápido | Medio | 1 sesión |
+| 6 | `TOOL-03` TypeScript con JSDoc gradual | Tipos sin migración | Bajo | varias sesiones |
 
 **Mi recomendación para el siguiente sprint**: empezar por `BUG-05` (quirúrgico, simplifica el núcleo, con tests de caracterización ya escritos). Después `REF-01` con confianza dado que la red de tests está montada.
 
@@ -381,7 +378,7 @@ Orden recomendado (refactores quirúrgicos primero, cosmético al final):
 - **Comparaciones `==`**: 0 (–22, todas migradas a `===`)
 - **Variables `let` reasignables sin justificación**: 0 (–76, migradas a `const`)
 - **Funciones puras testeables aisladamente**: 35 (antes: 0)
-- **Bugs críticos abiertos**: 0 · **bugs latentes pendientes**: 2 (`BUG-04`, `BUG-05`)
+- **Bugs críticos abiertos**: 0 · **bugs latentes pendientes**: 1 (`BUG-04`)
 
 ## Apéndice — Lo que NO he revisado en esta pasada
 
