@@ -1,5 +1,5 @@
 
-import {getFechaInit, getListaLibres, getListaSubgrupo} from './FuncionesComunes.js';
+import {getFechaInit, getListaLibres, getListaSubgrupo, letraAIndice} from './FuncionesComunes.js';
 
 export function getListaLibresGrua(year, grupo){
     let fechaInitGrupo1_2022 = new Date(2022,0,5);
@@ -52,29 +52,18 @@ function getPos(grupo){
         if (year > 2022) {
             fechaInit = new Date(getFechaInit(year, fechaInit, totalSec));
         }
-        let posSecuencia = getPosSecuencia(fechaInit);
+        const posSecuencia = getPosSecuencia(fechaInit);
        
         return getListaSubgrupo(year, fechaInit, secuencia, posSecuencia);
     }
 
 
     function getFechaSubgrupo2022(grupo, subgrupo) {
-        const posLetra = getPosSubgrupo(subgrupo);
+        const posLetra = letraAIndice(subgrupo);
         if (grupo >= 1 && grupo <= 5) {
             return subgrupos[grupo - 1][posLetra];
         }
         return subgrupos[grupo - 1][0];
-    }
-
-
-    
-    function getPosSubgrupo(subgrupo){
-        if(subgrupo === "B"){
-            return 1;
-        } else if(subgrupo === "C"){
-            return 2;
-        }
-        return 0;
     }
 
     function getPosSecuencia(fecha){

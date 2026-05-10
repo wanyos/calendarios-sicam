@@ -1,6 +1,5 @@
 
 import {getFechaInit, getListaLibres, getListaSubgrupoReduccion} from './FuncionesComunes.js';
-//const FuncionesComunes = require('../FuncionesComunes');
 
 export function getListaLibresParkingDSM100(year, grupo){
     let fechaInitGrupo1_2022 = new Date(2022,0,4);
@@ -13,7 +12,6 @@ export function getListaLibresParkingDSM100(year, grupo){
         fechaInitGrupo1_2022 = new Date(getFechaInicioGrupo(fechaInitGrupo1_2022, grupo));
         pos = getPosSecuencia(grupo);
     }
-    //return FuncionesComunes.getListaLibres(year, fechaInitGrupo1_2022, secuenciaLibres, secuenciaTrabajo, pos);
     return getListaLibres(year, fechaInitGrupo1_2022, secuenciaLibres, secuenciaTrabajo, pos);
 }
 
@@ -64,11 +62,8 @@ function getPosSecuencia(grupo){
             if (year > 2022) {
                 fechaInit = new Date(getFechaInit(year, fechaInit, totalSecuencia));
             }
-            //return FuncionesComunes.getListaSubgrupoReduccion(year, fechaInit, totalSecuencia);
             return getListaSubgrupoReduccion(year, fechaInit, totalSecuencia);
         }
 
 
 
-        //module.exports.getListaLibresParkingDSM100 = getListaLibresParkingDSM100;
-        //module.exports.getListaSubgrupoParkingDSM100 =getListaSubgrupoParkingDSM100;

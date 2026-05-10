@@ -1,6 +1,5 @@
 
 import {getFechaInit, getListaLibres, getListaSubgrupo} from './FuncionesComunes.js';
-//const FuncionesComunes = require('./FuncionesComunes');
 
 export function getListaLibresGruaDSM(year, grupo){
     let fechaInitGrupo1_2022 = new Date(2022,0,1);
@@ -14,7 +13,6 @@ export function getListaLibresGruaDSM(year, grupo){
         fechaInitGrupo1_2022 = new Date(getFechaInicioGrupo(fechaInitGrupo1_2022, grupo));
         pos = getPos(grupo);
     }
-    //return FuncionesComunes.getListaLibres(year, fechaInitGrupo1_2022, secuenciaLibres, secuenciaTrabajo, pos);
     return getListaLibres(year, fechaInitGrupo1_2022, secuenciaLibres, secuenciaTrabajo, pos);
 }
 
@@ -65,8 +63,7 @@ function getPos(grupo){
         if (year > 2022) {
             fechaInit = new Date(getFechaInit(year, fechaInit, totalSec));
         }
-        let posSecuencia = getPosSecuencia(fechaInit);
-       // return FuncionesComunes.getListaSubgrupo(year, fechaInit, secuencia, posSecuencia);
+        const posSecuencia = getPosSecuencia(fechaInit);
         return getListaSubgrupo(year, fechaInit, secuencia, posSecuencia);
     }
 
@@ -80,5 +77,3 @@ function getPos(grupo){
     }
 
 
-//module.exports.getListaLibresGruaDSM = getListaLibresGruaDSM;
-//module.exports.getListaSubgrupoGruaDSM = getListaSubgrupoGruaDSM;
