@@ -8,118 +8,62 @@ import 'tom-select/dist/css/tom-select.default.css';
 import { getDatosListaLibres, getDatosListaSubgrupo, getDatosListaSubComunes } from './calendarios/DatosFechas.js';
 import { initSelectGrupo, initSelectSubgrupo, initRotulos, initDivNavSup, initCajaRefuerzo } from './calendarios/InitCabecera.js';
 import { CATEGORIAS, NUMEROS_REFUERZO, LETRAS_REFUERZO } from './calendarios/Constantes.js';
+import {
+  claveFecha,
+  startDay,
+  getTotalDays,
+  getNombre,
+  getArrayMes,
+  comprobarDia,
+} from './calendarios/utils.js';
 
 let currentDate;
-let titulo = document.getElementById('titulo');
-let select_opcion = document.getElementById('select_opcion');
-let dias_semana = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
-let select_year = document.getElementById("select_year");
-let btn = document.getElementById('btn');
-let contenedor = document.getElementById("container-tabla");
-let rotulosSubgrupo = document.getElementById('rotulos-subgrupo');
-let divNavSup = document.getElementById('nav_sup');
-let divRefuerzo = document.getElementById('opcion-refuerzo');
+const titulo = document.getElementById('titulo');
+const selectOpcion = document.getElementById('select_opcion');
+const diasSemana = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
+const selectYear = document.getElementById("select_year");
+const btn = document.getElementById('btn');
+const contenedor = document.getElementById("container-tabla");
+const rotulosSubgrupo = document.getElementById('rotulos-subgrupo');
+const divNavSup = document.getElementById('nav_sup');
+const divRefuerzo = document.getElementById('opcion-refuerzo');
 
-let select_grupo = document.getElementById("select_grupo");
-let select_subgrupo = document.getElementById("select_subgrupo");
-let select_num = document.getElementById('select-num');
-let select_ltr = document.getElementById('select-ltr');
+const selectGrupo = document.getElementById("select_grupo");
+const selectSubgrupo = document.getElementById("select_subgrupo");
+const selectNum = document.getElementById('select-num');
+const selectLtr = document.getElementById('select-ltr');
 
-let listaLibresYear = [];
-let listaSubgrupoYear = [];
-let listaSubComunesYear = [];
-
-
-/*dia que empieza el mes*/
-function startDay(monthNumber) {
-    let start = new Date(currentDate.getFullYear(), monthNumber - 1, 1);
-    return ((start.getDay() - 1) == -1) ? 6 : start.getDay() - 1;
-}
-
-
-/*Anyo bisiesto*/
-function isLeap() {
-    return ((currentDate.getFullYear() % 100 !== 0) && (currentDate.getFullYear() % 4 == 0)
-        || (currentDate.getFullYear() % 400 == 0));
-}
-
-
-
-/*total dias de mes*/
-function getTotalDays(month) {
-    if (month == 1 || month == 3 || month == 5 || month == 7 || month == 8 || month == 10 || month == 12) {
-        return 31;
-    } else if (month == 4 || month == 6 || month == 9 || month == 11) {
-        return 30;
-    } else {
-        return isLeap() ? 29 : 28;
-    }
-}
-
-const comprobarDia = (numDia, mes) => {
-    if (numDia > 0) {
-        if (listaLibresYear.length > 0 && comprobarArray(listaLibresYear, numDia, mes)) {
-            listaLibresYear.shift();
-            return "libres";
-        } else if (listaSubgrupoYear != undefined && listaSubgrupoYear.length > 0 && comprobarArray(listaSubgrupoYear, numDia, mes)) {
-            listaSubgrupoYear.shift();
-            return "subgrupo";
-        } else if (listaSubComunesYear != undefined && listaSubComunesYear.length > 0 && comprobarArray(listaSubComunesYear, numDia, mes)) {
-            listaSubComunesYear.shift();
-            let sub = select_subgrupo.value;
-            if (sub === "A" || sub === "C" || sub === "E" || sub === "G" || sub === "I") {
-                return "sub1";
-            } else {
-                return "sub2";
-            }
-        }
-    }
-
-}
-
-function comprobarArray(array, numDia, mes) {
-    if (parseInt(numDia) === array[0].getDate() && (mes - 1) === array[0].getMonth()) {
-        return true;
-    }
-    return false;
-}
-
-
-
-function getArrayMes(espacios, totalDias) {
-    let arrayMes = new Array();
-    let contador = 0;
-    let num_dia = 1;
-
-    for (let a = 0; a < 42; a++) {
-        if (contador <= espacios || num_dia > totalDias) {
-            arrayMes.push(".");
-            contador++;
-        } else {
-            arrayMes.push("" + num_dia++);
-        }
-    }
-    return arrayMes;
-}
+// WHY: las listas de fechas se almacenan como Set<string> con clave canónica
+//      "YYYY-M-D" (mes 0-indexed, día 1-31). Esto permite:
+//        - lookup O(1) en comprobarDia (set.has(clave))
+//        - independencia del orden de pintado (antes el algoritmo dependía
+//          de que los meses y días se procesaran en orden creciente porque
+//          consumía con .shift())
+//        - re-renderizar parcialmente sin reconstruir las listas
+let setLibresYear = new Set();
+let setSubgrupoYear = new Set();
+let setSubComunesYear = new Set();
 
 
 function rellenarDias(tabla, mes) {
-    let numeroDias = getTotalDays(mes);
-    let espacios = startDay(mes) - 1;
+    const year = currentDate.getFullYear();
+    const numeroDias = getTotalDays(mes, year);
+    const espacios = startDay(mes, year) - 1;
     let tipoDia;
     let fragment = document.createDocumentFragment();
 
     const arrayMes = getArrayMes(espacios, numeroDias);
     let diaSemana = 0;
+    const sets = { libres: setLibresYear, subgrupo: setSubgrupoYear, subComunes: setSubComunesYear };
     for (const d of arrayMes) {
         if (diaSemana === 0) {
             fragment = document.createElement("tr");
         }
-        let columna = document.createElement("td");
+        const columna = document.createElement("td");
 
-        tipoDia = comprobarDia(d, mes);
+        tipoDia = comprobarDia(d, mes, year, sets, selectSubgrupo.value);
 
-        let dia = document.createTextNode(d);
+        const dia = document.createTextNode(d);
         columna.appendChild(dia);
         columna.setAttribute("class", tipoDia);
 
@@ -140,10 +84,10 @@ function rellenarDias(tabla, mes) {
 * @param {*} tabla elemento tabla
 */
 function rellenarTablaCabecera(tabla) {
-    let fila = document.createElement("tr");
-    for (let a = 0; a < dias_semana.length; a++) {
-        let cabecera = document.createElement("th");
-        let d = document.createTextNode(dias_semana[a]);
+    const fila = document.createElement("tr");
+    for (let a = 0; a < diasSemana.length; a++) {
+        const cabecera = document.createElement("th");
+        const d = document.createTextNode(diasSemana[a]);
         cabecera.appendChild(d);
         fila.appendChild(cabecera);
     }
@@ -152,39 +96,22 @@ function rellenarTablaCabecera(tabla) {
 
 
 
-function getNombre(n) {
-    switch (n) {
-        case 1: return "Enero";
-        case 2: return "Febrero";
-        case 3: return "Marzo";
-        case 4: return "Abril";
-        case 5: return "Mayo";
-        case 6: return "Junio";
-        case 7: return "Julio";
-        case 8: return "Agosto";
-        case 9: return "Septiembre";
-        case 10: return "Octubre";
-        case 11: return "Noviembre";
-        case 12: return "Diciembre";
-    }
-}
-
 /**
-* Crea una tabla para cada mes 
+* Crea una tabla para cada mes
 * llama a rellenar cabecera la cual rellena la cabecera de la tabla con los dias de la semana
-* @param {*} cont_tabla contenedor div que contendra la tabla
+* @param {*} contTabla contenedor div que contendra la tabla
 * @param {*} nombre nombre del mes
-* @param {*} num_mes numero del mes
+* @param {*} numMes numero del mes
 */
-function crearTabla(cont_tabla, nombre, num_mes) {
-    let tabla = document.createElement("table");
-    let nombre_mes = document.createElement("caption");
-    let contenido = document.createTextNode(nombre);
-    nombre_mes.appendChild(contenido);
-    tabla.appendChild(nombre_mes);
+function crearTabla(contTabla, nombre, numMes) {
+    const tabla = document.createElement("table");
+    const nombreMes = document.createElement("caption");
+    const contenido = document.createTextNode(nombre);
+    nombreMes.appendChild(contenido);
+    tabla.appendChild(nombreMes);
     rellenarTablaCabecera(tabla);
-    rellenarDias(tabla, num_mes);
-    cont_tabla.appendChild(tabla);
+    rellenarDias(tabla, numMes);
+    contTabla.appendChild(tabla);
 }
 
 
@@ -196,10 +123,10 @@ function crearMeses() {
     setDatos();
     const fragment = document.createDocumentFragment();
     for (let a = 1; a <= 12; a++) {
-        let cont_tabla = document.createElement("div");
-        cont_tabla.setAttribute("class", "div-mes");
-        crearTabla(cont_tabla, getNombre(a), a);
-        fragment.appendChild(cont_tabla);
+        const contTabla = document.createElement("div");
+        contTabla.setAttribute("class", "div-mes");
+        crearTabla(contTabla, getNombre(a), a);
+        fragment.appendChild(contTabla);
     }
     document.getElementById("container-tabla").appendChild(fragment);
 }
@@ -209,37 +136,41 @@ function nuevaFecha() {
     while (contenedor.firstChild) {
         contenedor.removeChild(contenedor.firstChild);
     }
-    currentDate = new Date(select_year.value, 0, 1);
+    currentDate = new Date(selectYear.value, 0, 1);
     crearMeses();
 }
 
 
 function setDatos() {
-    let year = parseInt(select_year.value);
+    const year = parseInt(selectYear.value);
     let grupo;
-    if(select_opcion.value === 'Refuerzo_Nocturno'){
-        grupo = select_grupo.value;
+    if(selectOpcion.value === 'Refuerzo_Nocturno'){
+        grupo = selectGrupo.value;
     } else {
-        grupo = parseInt(select_grupo.value);
+        grupo = parseInt(selectGrupo.value);
     }
 
-    let subgrupo = select_subgrupo.value;
-    let grupoDos = getGrupoDos();
+    const subgrupo = selectSubgrupo.value;
+    const grupoDos = getGrupoDos();
 
-    listaLibresYear = getDatosListaLibres(select_opcion.value, year, grupo, grupoDos);
-    //console.log(listaLibresYear)
-    listaSubgrupoYear = getDatosListaSubgrupo(select_opcion.value, year, grupo, subgrupo);
-    //console.log(listaSubgrupoYear);
-    listaSubComunesYear = getDatosListaSubComunes(select_opcion.value, year, grupo, subgrupo);
-    //console.log(listaSubComunesYear);
+    // WHY: algunas funciones de DatosFechas devuelven undefined para tipos
+    //      que no aplican (ej. getDatosListaSubgrupo no maneja GruaDSM_Noche).
+    //      ?? [] blinda contra eso sin tener que validar en cada caller.
+    const listaLibres = getDatosListaLibres(selectOpcion.value, year, grupo, grupoDos) ?? [];
+    const listaSubgrupo = getDatosListaSubgrupo(selectOpcion.value, year, grupo, subgrupo) ?? [];
+    const listaSubComunes = getDatosListaSubComunes(selectOpcion.value, year, grupo, subgrupo) ?? [];
+
+    setLibresYear = new Set(listaLibres.map(claveFecha));
+    setSubgrupoYear = new Set(listaSubgrupo.map(claveFecha));
+    setSubComunesYear = new Set(listaSubComunes.map(claveFecha));
 }
 
 function getGrupoDos(){
-    let rdActivo = document.querySelector('input[name="opcion"]:checked');
+    const rdActivo = document.querySelector('input[name="opcion"]:checked');
     if(rdActivo.value === 'Num'){
-        return select_num.value;
+        return selectNum.value;
     } else if(rdActivo.value === 'Ltr'){
-        return select_ltr.value;
+        return selectLtr.value;
     }
 }
 
@@ -250,27 +181,27 @@ function initCalendario() {
     //      veces sin separar ("GruaDSM"); el text del <option> ya está en
     //      formato legible. Así el HTML queda como única fuente de verdad
     //      para los nombres y no duplicamos el mapeo en JS.
-    titulo.textContent = select_opcion.selectedOptions[0].text;
+    titulo.textContent = selectOpcion.selectedOptions[0].text;
     //iniciar caja con opciones para refuerzo nocturno
     opcion();
-    initCajaRefuerzo(select_opcion.value, divNavSup, divRefuerzo);
-    initSelectGrupo(select_opcion.value, select_grupo);
-    //el select_grupo.value es necesario para GruaDSM
-    initSelectSubgrupo(select_opcion.value, select_subgrupo, select_grupo.value);
+    initCajaRefuerzo(selectOpcion.value, divNavSup, divRefuerzo);
+    initSelectGrupo(selectOpcion.value, selectGrupo);
+    //el selectGrupo.value es necesario para GruaDSM
+    initSelectSubgrupo(selectOpcion.value, selectSubgrupo, selectGrupo.value);
      //el valor divNavSup es necesario para GruaDSMNoche, eliminar el select subgrupo
-    initDivNavSup(select_opcion.value, divNavSup);
-    initRotulos(select_opcion.value, rotulosSubgrupo);
+    initDivNavSup(selectOpcion.value, divNavSup);
+    initRotulos(selectOpcion.value, rotulosSubgrupo);
     nuevaFecha();
 }
 
 function opcion(){
-    let elementoActivo = document.querySelector('input[name="opcion"]:checked');
+    const elementoActivo = document.querySelector('input[name="opcion"]:checked');
     if(elementoActivo.value === 'Num') {
-        select_num.disabled = false;
-        select_ltr.disabled = true;
+        selectNum.disabled = false;
+        selectLtr.disabled = true;
     } else if(elementoActivo.value === 'Ltr') {
-        select_num.disabled = true;
-        select_ltr.disabled = false;
+        selectNum.disabled = true;
+        selectLtr.disabled = false;
     }
 }
 
@@ -300,9 +231,9 @@ function poblarSelect(select, items) {
 //      como pura estructura. Debe correr ANTES de TomSelect (la librería
 //      fotografía las <option> al construirse).
 function poblarSelectsEstaticos() {
-    poblarSelect(select_opcion, CATEGORIAS);
-    poblarSelect(select_num, NUMEROS_REFUERZO);
-    poblarSelect(select_ltr, LETRAS_REFUERZO);
+    poblarSelect(selectOpcion, CATEGORIAS);
+    poblarSelect(selectNum, NUMEROS_REFUERZO);
+    poblarSelect(selectLtr, LETRAS_REFUERZO);
 }
 
 // WHY: ventana deslizante de años (-2 atrás, +10 adelante desde el año en
@@ -313,18 +244,18 @@ function poblarSelectYear() {
     const actual = new Date().getFullYear();
     const years = [];
     for (let y = actual - 2; y <= actual + 10; y++) years.push(y);
-    poblarSelect(select_year, years);
-    select_year.value = actual;
+    poblarSelect(selectYear, years);
+    selectYear.value = actual;
 }
 
 poblarSelectsEstaticos();
 poblarSelectYear();
 
 btn.addEventListener('click', nuevaFecha);
-select_opcion.addEventListener('change', initCalendario);
-select_grupo.addEventListener('change', () => {
-    if (select_opcion.value === 'GruaDSM') {
-        initSelectSubgrupo(select_opcion.value, select_subgrupo, select_grupo.value);
+selectOpcion.addEventListener('change', initCalendario);
+selectGrupo.addEventListener('change', () => {
+    if (selectOpcion.value === 'GruaDSM') {
+        initSelectSubgrupo(selectOpcion.value, selectSubgrupo, selectGrupo.value);
     }
 });
 
@@ -332,11 +263,13 @@ document.getElementById("rdNum").addEventListener('click', opcion);
 document.getElementById("rdLtr").addEventListener('click', opcion);
 
 
+// WHY: initCalendario() ya cierra con nuevaFecha() internamente (vía la cadena
+//      initRotulos → nuevaFecha). Llamarlo otra vez aquí provocaba un doble
+//      build del DOM al cargar (flash visible).
 initCalendario();
-nuevaFecha();
 
 // WHY: inicializar Tom Select DESPUÉS de la primera render — para entonces
-//      select_grupo y select_subgrupo ya están poblados, y TomSelect copia
+//      selectGrupo y selectSubgrupo ya están poblados, y TomSelect copia
 //      las <option> existentes a su estado interno. controlInput:null oculta
 //      la búsqueda (las listas son cortas y fijas, sería un cuadro de texto
 //      de adorno). dropdownParent:'body' saca el menú del stacking context
@@ -349,5 +282,5 @@ const tomConfig = {
     create: false,
     dropdownParent: 'body',
 };
-[select_opcion, select_year, select_grupo, select_subgrupo, select_num, select_ltr]
+[selectOpcion, selectYear, selectGrupo, selectSubgrupo, selectNum, selectLtr]
     .forEach(el => new TomSelect(el, tomConfig));

@@ -1,5 +1,4 @@
 
-//const FuncionesComunes = require('./FuncionesComunes');
 import {getFechaInit, getListaLibres} from './FuncionesComunes.js';
 
 export function getListaLibresGruaDSMNoche(year, grupo){
@@ -13,7 +12,6 @@ export function getListaLibresGruaDSMNoche(year, grupo){
         fechaInitGrupo1_2022 = new Date(getFechaInicioGrupo(fechaInitGrupo1_2022, grupo));
         pos = getPosSecuencia(grupo);
     }
-    //return FuncionesComunes.getListaLibres(year, fechaInitGrupo1_2022, secuenciaLibres, secuenciaTrabajo, pos);
     return getListaLibres(year, fechaInitGrupo1_2022, secuenciaLibres, secuenciaTrabajo, pos);
 }
 
@@ -34,4 +32,3 @@ function getPosSecuencia(grupo){
 }
 
 
-//module.exports.getListaLibresGruaDSMNoche = getListaLibresGruaDSMNoche;
