@@ -17,10 +17,19 @@ export function getListaLibresGruaDSM(year, grupo){
 }
 
 
+// WHY (BUG-04 cerrado 2026-05-10): el switch SOLO maneja grupo 2 y 3.
+//      Para grupos 4 y 5 NO se ajusta la fecha — heredan la fecha del
+//      grupo 1. Esto NO es un bug aunque lo parezca: getPos asigna pos
+//      distintas a cada grupo (4→2, 5→3), lo que produce listas de
+//      libres distintas aunque compartan fecha base. Validado con los
+//      calendarios impresos oficiales 2026 G-4 y G-5 (motor de
+//      subgrupos coincide con 18 de 20 valores; los 2 que difieren
+//      son typos del impreso, ver tests/calendarios/FechasGruaDSM.test.js).
 function getFechaInicioGrupo(fecha, grupo){
     switch(grupo){
         case 2: fecha = new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate() + 5); break;
         case 3: fecha = new Date(fecha.getFullYear(), fecha.getMonth(), fecha.getDate() + 7); break;
+        // grupos 4 y 5: comparten fecha de inicio con grupo 1 (intencional).
     }
     return fecha;
 }
