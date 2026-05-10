@@ -16,12 +16,11 @@ export function getListaLibresInspectorNoche(year, grupo) {
     //se cambian los subgrupos a partir del año 2020
     //se crea un array por cada grupo y cada posición del array corresponde a su letra a,b,c,d...
     //se guarda en cada posición la fecha de inicio de su respectiva letra
-    // WHY (2026-05-09): los dos últimos new Date(...) (grupo 4 J y grupo 5 J)
+    // WHY (2026-05-10): los dos últimos new Date(...) (grupo 4 J y grupo 5 J)
     //   tenían un typo (faltaba la coma del día): (2022,21) y (2022,114).
     //   Reconstruidos a (2022,1,21) y (2022,1,14) siguiendo el patrón
-    //   "-1 día respecto a Inspector" consistente con los otros 9 subgrupos.
-    //   PENDIENTE: validar contra calendario impreso oficial.
-    //   Ver docs/REVISION_CALENDARIOS.md → BUG-01.
+    //   "-1 día respecto a Inspector". Validado contra calendario impreso
+    //   oficial 2026. Ver docs/REVISION_CALENDARIOS.md → BUG-01.
     const subgrupos = [
         [new Date(2022,1,1), new Date(2022,0,2), new Date(2022,1,6), new Date(2022,0,6), new Date(2022,1,10), new Date(2022,0,12), new Date(2022,1,16), new Date(2022,0,3), new Date(2022,1,7), new Date(2022,2,14)],
         [new Date(2022,0,25), new Date(2022,2,1), new Date(2022,0,30), new Date(2022,2,6), new Date(2022,1,3), new Date(2022,0,5), new Date(2022,1,9), new Date(2022,2,16), new Date(2022,0,31), new Date(2022,2,7)],

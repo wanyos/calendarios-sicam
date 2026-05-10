@@ -18,11 +18,11 @@ Severidad:
 
 ## Resumen ejecutivo
 
-**Progreso a 2026-05-10 (segunda sesión)**: 12 hallazgos resueltos · 1 aplicado pendiente validación · 5 pendientes (más 3 que requieren fuente externa o son refactores grandes).
+**Progreso a 2026-05-10 (tercera sesión)**: 14 hallazgos resueltos · 0 pendientes de validación · 5 pendientes (3 son refactores grandes o cosméticos, 2 dependen de input externo).
 
 | Categoría | Total | ✅ | ⚠️ | ⏳ |
 |---|---|---|---|---|
-| Bugs críticos / latentes | 6 | 3 | 1 | 2 |
+| Bugs críticos / latentes | 6 | 4 | 0 | 2 |
 | Legibilidad / duplicación | 8 | 6 | 0 | 2 |
 | Rendimiento | 3 | 1 | 0 | 2 |
 | Seguridad | 1 | 1 | 0 | 0 |
@@ -39,21 +39,22 @@ Severidad:
 
 ### `BUG-01` 🔴 — Fechas malformadas en `FechasInspectorNoche.js`
 
-- [x] **Aplicado 2026-05-09** — valores deducidos por patrón, **pendiente validación contra calendario impreso oficial**
-- **Archivo**: [src/calendarios/FechasInspectorNoche.js:18-26](src/calendarios/FechasInspectorNoche.js#L18-L26)
+- [x] **Cerrado 2026-05-10** — validado contra calendario impreso oficial:
+  - **Grupo 4**: 10 subgrupos × 5 fechas/año (50 fechas) verificadas con tests directos.
+  - **Grupo 5**: subgrupos G y J validados visualmente en la app contra el calendario impreso. Como el array de grupo 5 no tiene typos en el resto de subgrupos y la lógica de propagación es la misma, los demás se consideran correctos por extensión.
+- **Archivo**: [src/calendarios/FechasInspectorNoche.js:18-25](src/calendarios/FechasInspectorNoche.js#L18-L25)
 - **Síntoma original**: si el usuario seleccionaba **Inspector Noche → grupo 4 → subgrupo J** o **grupo 5 → subgrupo J**, el calendario arrancaba desde una fecha completamente equivocada (octubre 2023 o julio 2031 respectivamente).
 - **Causa**: dos `new Date()` con argumentos truncados — faltaba la coma del día:
   ```js
   new Date(2022,21)        // mes 21 → JS rebalancea a octubre 2023
   new Date(2022,114)       // mes 114 → julio 2031
   ```
-- **Valores aplicados**:
+- **Valores aplicados y validados**:
   ```js
-  // grupo 4 [J]: era (2022,21) → (2022, 1, 21)  // 21 febrero 2022
-  // grupo 5 [J]: era (2022,114) → (2022, 1, 14)  // 14 febrero 2022
+  // grupo 4 [J]: era (2022,21) → (2022, 1, 21)  // 21 febrero 2022 ✓
+  // grupo 5 [J]: era (2022,114) → (2022, 1, 14)  // 14 febrero 2022 ✓
   ```
-- **Razonamiento**: el array de InspectorNoche tiene un patrón consistente "-1 día respecto a Inspector" en los otros 9 subgrupos del grupo. Los valores aplicados respetan ese patrón. Adicionalmente, la firma del typo (`(2022, 1, 21)` con coma perdida → `(2022, 21)`) refuerza la deducción.
-- **🔬 ACCIÓN PENDIENTE — validación**: probar la app con **Inspector Noche grupo 4 subgrupo J año 2026** y comparar contra el calendario impreso oficial. Si las fechas coinciden, este bug se cierra definitivamente. Si no coinciden, los valores correctos deben tomarse del calendario impreso y este `BUG-01` se reabre. Mismo procedimiento para grupo 5 J.
+- **Falsa alarma intermedia**: durante la validación, el snapshot original mostraba fechas en UTC (`toISOString().slice(0,10)`), que en España (UTC+1/+2) salían 1 día antes de la fecha local. Llevó a pensar que había discrepancia. Tras cambiar el formato del snapshot a fecha local (`getFullYear/getMonth/getDate`), todo coincidió.
 
 ### `BUG-02` 🔴 — Doble inicialización al arrancar la app
 
@@ -333,7 +334,7 @@ Severidad:
 | 2 | `REF-03` limpiar comentarios CommonJS | `f522151` |
 | 3 | `TOOL-01` instalar ESLint | `f522151` |
 | 4 | `REF-04` + `REF-05` (auto-fix) | `f522151` |
-| 5 | `BUG-01` fechas malformadas (⚠️ pendiente validación) | `f522151` |
+| 5 | `BUG-01` fechas malformadas Inspector_Noche (validado oficial 2026-05-10) | `f522151` |
 | 6 | `TOOL-02` Vitest + suite completa de smoke tests | `553c83e` + `ccf0c90` |
 | 7 | `BUG-03` `comprobarDia` con Set + `BONUS-01` extracción a `utils.js` + tests del núcleo | `9bb920c` |
 | 8 | `PERF-03` doble `getDay()` (de paso con la extracción) | `9bb920c` |
@@ -354,9 +355,8 @@ Orden recomendado (refactores quirúrgicos primero, cosmético al final):
 | 3 | `PERF-01` mutar Date en bucles de `FuncionesComunes` | Marginal | Medio | 20 min |
 | 4 | `REF-07` naming uniforme camelCase | Cosmético | Nulo | 15 min |
 | 5 | `BUG-04` documentar/fix GruaDSM grupos 4-5 | Aclarar diseño | Medio (validación externa) | requiere fuente |
-| 6 | `BUG-01` validación oficial Inspector_Noche J | Cierre del bug | — | requiere calendario impreso |
-| 7 | `PERF-02` cachear celdas DOM | Render más rápido | Medio | 1 sesión |
-| 8 | `TOOL-03` TypeScript con JSDoc gradual | Tipos sin migración | Bajo | varias sesiones |
+| 6 | `PERF-02` cachear celdas DOM | Render más rápido | Medio | 1 sesión |
+| 7 | `TOOL-03` TypeScript con JSDoc gradual | Tipos sin migración | Bajo | varias sesiones |
 
 **Mi recomendación para el siguiente sprint**: empezar por `BUG-05` (quirúrgico, simplifica el núcleo, con tests de caracterización ya escritos). Después `REF-01` con confianza dado que la red de tests está montada.
 
