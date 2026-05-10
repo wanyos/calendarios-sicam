@@ -18,20 +18,20 @@ Severidad:
 
 ## Resumen ejecutivo
 
-**Progreso a 2026-05-10 (quinta sesión)**: 16 hallazgos resueltos · 0 pendientes de validación · 3 pendientes (cosmético/opcional/dependiente externa).
+**Progreso a 2026-05-10 (sexta sesión)**: 18 hallazgos resueltos · 0 pendientes de validación · 3 pendientes (1 dependiente externa, 2 opcionales).
 
 | Categoría | Total | ✅ | ⚠️ | ⏳ |
 |---|---|---|---|---|
 | Bugs críticos / latentes | 6 | 5 | 0 | 1 |
-| Legibilidad / duplicación | 8 | 7 | 0 | 1 |
-| Rendimiento | 3 | 1 | 0 | 2 |
+| Legibilidad / duplicación | 8 | 8 | 0 | 0 |
+| Rendimiento | 3 | 2 | 0 | 1 |
 | Seguridad | 1 | 1 | 0 | 0 |
 | Tooling | 3 | 2 | 0 | 1 |
 | **Bonus** (no en plan original) | — | 1 | 0 | 0 |
 
 **Bonus completado**: extracción de funciones puras de `index.js` a `src/calendarios/utils.js` (8 funciones desacopladas de globales y testeables aisladamente).
 
-**Próximo paso recomendado**: tareas pequeñas que cierran el sprint — `REF-07` (naming uniforme camelCase) y `PERF-01` (mutar Date en bucles). El resto (`BUG-04`, `PERF-02`, `TOOL-03`) requiere fuente externa o son refactores no urgentes.
+**Estado**: lo único pendiente son tareas dependientes de input externo (`BUG-04` requiere calendario impreso de GruaDSM grupos 4-5) o mejoras opcionales no urgentes (`PERF-02` cachear celdas DOM, `TOOL-03` TypeScript). El sprint principal está cerrado.
 
 ---
 
@@ -164,9 +164,9 @@ Severidad:
 
 ### `REF-07` 🟡 — Naming inconsistente (camelCase vs snake_case)
 
-- [ ] **Archivo**: [src/index.js](src/index.js)
-- **Problema**: variables mezclan `camelCase` (`tipoCalendario`, `arrayMes`) con `snake_case` (`select_grupo`, `num_dia`, `cont_tabla`).
-- **Fix sugerido**: estandarizar a `camelCase` en JS (convención del lenguaje). No es urgente — es un refactor mecánico que puede esperar.
+- [x] **Resuelto 2026-05-10** — 53 ocurrencias de identificadores snake_case migradas a camelCase en `index.js`: `select_grupo` → `selectGrupo`, `cont_tabla` → `contTabla`, `dias_semana` → `diasSemana`, `num_mes` → `numMes`, `nombre_mes` → `nombreMes`, etc. Los **IDs HTML se preservaron** (cambiarlos rompería selectores CSS y contratos con herramientas externas).
+- **Técnica**: `perl` con lookbehind/lookahead `(?<![\x27\x22])\bid\b(?![\x27\x22])` para excluir las ocurrencias dentro de strings (`'select_grupo'` en `getElementById`), garantizando que solo se renombran identificadores JS.
+- **Archivo**: [src/index.js](src/index.js)
 
 ### `REF-08` 🟡 — Acoplamiento DOM frágil en `initRotulos`
 
@@ -179,20 +179,12 @@ Severidad:
 
 ### `PERF-01` 🟡 — Creación masiva de `Date` en bucles
 
-- [ ] **Archivos**: [FuncionesComunes.js:29,32,49,66](src/calendarios/FuncionesComunes.js#L29)
-  ```js
-  fechaInit = new Date(fechaInit.getFullYear(), fechaInit.getMonth(), fechaInit.getDate() + 1);
-  ```
-- **Problema**: cada iteración del bucle crea un nuevo objeto `Date` con 3 lookups (`getFullYear`, `getMonth`, `getDate`). Para un año = ~365 iteraciones por calendario, multiplicado por 3 listas (libres, subgrupo, comunes) = ~1000+ objetos `Date` creados por carga.
-- **Coste actual**: en hardware moderno son ~5-15ms. Imperceptible. Pero es un patrón que escala mal.
-- **Fix sugerido**: mutar el mismo `Date`:
-  ```js
-  fechaInit.setDate(fechaInit.getDate() + 1);
-  // o:
-  fechaInit.setTime(fechaInit.getTime() + 86400000);
-  ```
-  Reduce GC pressure y simplifica el código.
-  - **OJO**: si las fechas se almacenan en un array (`lista.push(fechaInit)`) y luego se mutan, el array entero apunta al mismo Date final → **bug**. Hay que **clonar al push**: `lista.push(new Date(fechaInit))`. Esto es un refactor con riesgo, no urgente.
+- [x] **Resuelto 2026-05-10** — las 3 funciones (`getListaLibres`, `getListaSubgrupo`, `getListaSubgrupoReduccion`) mutan ahora un cursor con `setDate()` en lugar de crear un nuevo `Date` por iteración. **Reducción ~300 objetos Date por llamada** (en bucles de calentamiento de varios años).
+- **Archivo**: [src/calendarios/FuncionesComunes.js:55-115](src/calendarios/FuncionesComunes.js#L55-L115)
+- **Dos defensas críticas aplicadas** (documentadas en el WHY del archivo):
+  1. **Clonar al entrar** (`const cursor = new Date(fechaInit)`): sin esto, mutar el parámetro corrompe las matrices de fechas iniciales (que viven en `FechasFactory.js` como referencias globales). La 2ª llamada al calendario daría fechas equivocadas.
+  2. **Clonar al push** (`lista.push(new Date(cursor))`): si pusheáramos la referencia y luego mutáramos, todas las entradas del array apuntarían al mismo Date final.
+- **Verificación**: 636 tests pasan idénticos antes y después + verificación manual en navegador (cambios repetidos de calendario sin desviaciones).
 
 ### `PERF-02` 🟡 — Re-build completo del DOM en cada cambio
 
@@ -323,17 +315,17 @@ Severidad:
 | 13 | `REF-08` `data-rol` para `initRotulos` | `0aee9cc` |
 | 14 | `BUG-01` validación oficial Inspector_Noche grupos 4 y 5 | `fa5701e` |
 | 15 | `BUG-05` `getFechaInit` simplificado y documentado | `b2c71f5` |
-| 16 | `REF-01` factoría `crearCalendarioBasico` (4 calendarios uniformes) | (sin commitear todavía) |
+| 16 | `REF-01` factoría `crearCalendarioBasico` (4 calendarios uniformes) | `77ab60f` |
+| 17 | `PERF-01` mutación de Date con cursor en `FuncionesComunes` | (sin commitear todavía) |
+| 18 | `REF-07` snake_case → camelCase en `index.js` (53 ocurrencias) | (sin commitear todavía) |
 
-### ⏳ Pendiente
+### ⏳ Pendiente (todas opcionales o bloqueadas por input externo)
 
 | # | Tarea | Beneficio | Riesgo | Estimado |
 |---|---|---|---|---|
-| 1 | `PERF-01` mutar Date en bucles de `FuncionesComunes` | Marginal | Medio | 20 min |
-| 2 | `REF-07` naming uniforme camelCase | Cosmético | Nulo | 15 min |
-| 3 | `BUG-04` documentar/fix GruaDSM grupos 4-5 | Aclarar diseño | Medio (validación externa) | requiere fuente |
-| 4 | `PERF-02` cachear celdas DOM | Render más rápido | Medio | 1 sesión |
-| 5 | `TOOL-03` TypeScript con JSDoc gradual | Tipos sin migración | Bajo | varias sesiones |
+| 1 | `BUG-04` documentar/fix GruaDSM grupos 4-5 | Aclarar diseño | Medio | requiere calendario impreso oficial |
+| 2 | `PERF-02` cachear celdas DOM | Render más rápido | Medio | 1 sesión, no urgente |
+| 3 | `TOOL-03` TypeScript con JSDoc gradual | Tipos sin migración | Bajo | varias sesiones, mejora a largo plazo |
 
 **Mi recomendación para el siguiente sprint**: empezar por `BUG-05` (quirúrgico, simplifica el núcleo, con tests de caracterización ya escritos). Después `REF-01` con confianza dado que la red de tests está montada.
 

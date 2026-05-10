@@ -54,20 +54,36 @@ export const getFechaInit = (year, fechaFin, valorSecuencia) => {
 };
 
 
+// WHY: las 3 funciones siguientes mutan internamente un cursor de fecha
+//      con setDate() en lugar de crear un nuevo Date en cada iteración.
+//      La iteración desde año base hasta `year` puede crear ~300+ Date
+//      por llamada (peor en secuencias grandes). Mutar reduce a ~1 Date
+//      por fecha pintada.
+//
+//      DOS CUIDADOS CRÍTICOS:
+//      1. Clonamos `fechaInit` al entrar (`new Date(fechaInit)`) para no
+//         mutar el parámetro del caller. Sin esto, las matrices de fechas
+//         iniciales (que son referencias globales en FechasFactory.js)
+//         quedarían corrompidas tras la primera llamada.
+//      2. Cuando hacemos push, también clonamos. Si pusheáramos la
+//         referencia y luego mutáramos, todas las entradas del array
+//         apuntarían al Date final.
+
 export const getListaLibres = (year, fechaInit, libres, trabajo, pos) => {
+    const cursor = new Date(fechaInit);
     const lista = [];
 
-    while (fechaInit.getFullYear() <= year) {
+    while (cursor.getFullYear() <= year) {
         const totalLibres = libres[pos];
         for (let a = 0; a < totalLibres; a++) {
-            if (fechaInit.getFullYear() === year) {
-                lista.push(fechaInit);
+            if (cursor.getFullYear() === year) {
+                lista.push(new Date(cursor));
             }
             if (a < totalLibres - 1) {
-                fechaInit = new Date(fechaInit.getFullYear(), fechaInit.getMonth(), fechaInit.getDate() + 1);
+                cursor.setDate(cursor.getDate() + 1);
             }
         }
-        fechaInit = new Date(fechaInit.getFullYear(), fechaInit.getMonth(), fechaInit.getDate() + trabajo[pos]);
+        cursor.setDate(cursor.getDate() + trabajo[pos]);
         pos++;
         if (pos > libres.length - 1) {
             pos = 0;
@@ -78,16 +94,17 @@ export const getListaLibres = (year, fechaInit, libres, trabajo, pos) => {
 
 
 export const getListaSubgrupo = (year, fechaInit, secuencia, pos) => {
+    const cursor = new Date(fechaInit);
     const lista = [];
 
-    while (fechaInit.getFullYear() <= year) {
-        if (fechaInit.getFullYear() === year) {
-            lista.push(fechaInit);
+    while (cursor.getFullYear() <= year) {
+        if (cursor.getFullYear() === year) {
+            lista.push(new Date(cursor));
         }
-        fechaInit = new Date(fechaInit.getFullYear(), fechaInit.getMonth(), fechaInit.getDate() + secuencia[pos]);
+        cursor.setDate(cursor.getDate() + secuencia[pos]);
         pos++;
         if (pos > secuencia.length - 1) {
-            pos = 0
+            pos = 0;
         }
     }
     return lista;
@@ -95,13 +112,14 @@ export const getListaSubgrupo = (year, fechaInit, secuencia, pos) => {
 
 
 export const getListaSubgrupoReduccion = (year, fechaInit, totalSecuencia) => {
+    const cursor = new Date(fechaInit);
     const lista = [];
 
-    while (fechaInit.getFullYear() <= year) {
-        if (fechaInit.getFullYear() === year) {
-            lista.push(fechaInit);
+    while (cursor.getFullYear() <= year) {
+        if (cursor.getFullYear() === year) {
+            lista.push(new Date(cursor));
         }
-        fechaInit = new Date(fechaInit.getFullYear(), fechaInit.getMonth(), fechaInit.getDate() + totalSecuencia);
+        cursor.setDate(cursor.getDate() + totalSecuencia);
     }
 
     return lista;

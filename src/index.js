@@ -19,19 +19,19 @@ import {
 
 let currentDate;
 const titulo = document.getElementById('titulo');
-const select_opcion = document.getElementById('select_opcion');
-const dias_semana = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
-const select_year = document.getElementById("select_year");
+const selectOpcion = document.getElementById('select_opcion');
+const diasSemana = ['L', 'M', 'X', 'J', 'V', 'S', 'D'];
+const selectYear = document.getElementById("select_year");
 const btn = document.getElementById('btn');
 const contenedor = document.getElementById("container-tabla");
 const rotulosSubgrupo = document.getElementById('rotulos-subgrupo');
 const divNavSup = document.getElementById('nav_sup');
 const divRefuerzo = document.getElementById('opcion-refuerzo');
 
-const select_grupo = document.getElementById("select_grupo");
-const select_subgrupo = document.getElementById("select_subgrupo");
-const select_num = document.getElementById('select-num');
-const select_ltr = document.getElementById('select-ltr');
+const selectGrupo = document.getElementById("select_grupo");
+const selectSubgrupo = document.getElementById("select_subgrupo");
+const selectNum = document.getElementById('select-num');
+const selectLtr = document.getElementById('select-ltr');
 
 // WHY: las listas de fechas se almacenan como Set<string> con clave canónica
 //      "YYYY-M-D" (mes 0-indexed, día 1-31). Esto permite:
@@ -61,7 +61,7 @@ function rellenarDias(tabla, mes) {
         }
         const columna = document.createElement("td");
 
-        tipoDia = comprobarDia(d, mes, year, sets, select_subgrupo.value);
+        tipoDia = comprobarDia(d, mes, year, sets, selectSubgrupo.value);
 
         const dia = document.createTextNode(d);
         columna.appendChild(dia);
@@ -85,9 +85,9 @@ function rellenarDias(tabla, mes) {
 */
 function rellenarTablaCabecera(tabla) {
     const fila = document.createElement("tr");
-    for (let a = 0; a < dias_semana.length; a++) {
+    for (let a = 0; a < diasSemana.length; a++) {
         const cabecera = document.createElement("th");
-        const d = document.createTextNode(dias_semana[a]);
+        const d = document.createTextNode(diasSemana[a]);
         cabecera.appendChild(d);
         fila.appendChild(cabecera);
     }
@@ -99,19 +99,19 @@ function rellenarTablaCabecera(tabla) {
 /**
 * Crea una tabla para cada mes
 * llama a rellenar cabecera la cual rellena la cabecera de la tabla con los dias de la semana
-* @param {*} cont_tabla contenedor div que contendra la tabla
+* @param {*} contTabla contenedor div que contendra la tabla
 * @param {*} nombre nombre del mes
-* @param {*} num_mes numero del mes
+* @param {*} numMes numero del mes
 */
-function crearTabla(cont_tabla, nombre, num_mes) {
+function crearTabla(contTabla, nombre, numMes) {
     const tabla = document.createElement("table");
-    const nombre_mes = document.createElement("caption");
+    const nombreMes = document.createElement("caption");
     const contenido = document.createTextNode(nombre);
-    nombre_mes.appendChild(contenido);
-    tabla.appendChild(nombre_mes);
+    nombreMes.appendChild(contenido);
+    tabla.appendChild(nombreMes);
     rellenarTablaCabecera(tabla);
-    rellenarDias(tabla, num_mes);
-    cont_tabla.appendChild(tabla);
+    rellenarDias(tabla, numMes);
+    contTabla.appendChild(tabla);
 }
 
 
@@ -123,10 +123,10 @@ function crearMeses() {
     setDatos();
     const fragment = document.createDocumentFragment();
     for (let a = 1; a <= 12; a++) {
-        const cont_tabla = document.createElement("div");
-        cont_tabla.setAttribute("class", "div-mes");
-        crearTabla(cont_tabla, getNombre(a), a);
-        fragment.appendChild(cont_tabla);
+        const contTabla = document.createElement("div");
+        contTabla.setAttribute("class", "div-mes");
+        crearTabla(contTabla, getNombre(a), a);
+        fragment.appendChild(contTabla);
     }
     document.getElementById("container-tabla").appendChild(fragment);
 }
@@ -136,29 +136,29 @@ function nuevaFecha() {
     while (contenedor.firstChild) {
         contenedor.removeChild(contenedor.firstChild);
     }
-    currentDate = new Date(select_year.value, 0, 1);
+    currentDate = new Date(selectYear.value, 0, 1);
     crearMeses();
 }
 
 
 function setDatos() {
-    const year = parseInt(select_year.value);
+    const year = parseInt(selectYear.value);
     let grupo;
-    if(select_opcion.value === 'Refuerzo_Nocturno'){
-        grupo = select_grupo.value;
+    if(selectOpcion.value === 'Refuerzo_Nocturno'){
+        grupo = selectGrupo.value;
     } else {
-        grupo = parseInt(select_grupo.value);
+        grupo = parseInt(selectGrupo.value);
     }
 
-    const subgrupo = select_subgrupo.value;
+    const subgrupo = selectSubgrupo.value;
     const grupoDos = getGrupoDos();
 
     // WHY: algunas funciones de DatosFechas devuelven undefined para tipos
     //      que no aplican (ej. getDatosListaSubgrupo no maneja GruaDSM_Noche).
     //      ?? [] blinda contra eso sin tener que validar en cada caller.
-    const listaLibres = getDatosListaLibres(select_opcion.value, year, grupo, grupoDos) ?? [];
-    const listaSubgrupo = getDatosListaSubgrupo(select_opcion.value, year, grupo, subgrupo) ?? [];
-    const listaSubComunes = getDatosListaSubComunes(select_opcion.value, year, grupo, subgrupo) ?? [];
+    const listaLibres = getDatosListaLibres(selectOpcion.value, year, grupo, grupoDos) ?? [];
+    const listaSubgrupo = getDatosListaSubgrupo(selectOpcion.value, year, grupo, subgrupo) ?? [];
+    const listaSubComunes = getDatosListaSubComunes(selectOpcion.value, year, grupo, subgrupo) ?? [];
 
     setLibresYear = new Set(listaLibres.map(claveFecha));
     setSubgrupoYear = new Set(listaSubgrupo.map(claveFecha));
@@ -168,9 +168,9 @@ function setDatos() {
 function getGrupoDos(){
     const rdActivo = document.querySelector('input[name="opcion"]:checked');
     if(rdActivo.value === 'Num'){
-        return select_num.value;
+        return selectNum.value;
     } else if(rdActivo.value === 'Ltr'){
-        return select_ltr.value;
+        return selectLtr.value;
     }
 }
 
@@ -181,27 +181,27 @@ function initCalendario() {
     //      veces sin separar ("GruaDSM"); el text del <option> ya está en
     //      formato legible. Así el HTML queda como única fuente de verdad
     //      para los nombres y no duplicamos el mapeo en JS.
-    titulo.textContent = select_opcion.selectedOptions[0].text;
+    titulo.textContent = selectOpcion.selectedOptions[0].text;
     //iniciar caja con opciones para refuerzo nocturno
     opcion();
-    initCajaRefuerzo(select_opcion.value, divNavSup, divRefuerzo);
-    initSelectGrupo(select_opcion.value, select_grupo);
-    //el select_grupo.value es necesario para GruaDSM
-    initSelectSubgrupo(select_opcion.value, select_subgrupo, select_grupo.value);
+    initCajaRefuerzo(selectOpcion.value, divNavSup, divRefuerzo);
+    initSelectGrupo(selectOpcion.value, selectGrupo);
+    //el selectGrupo.value es necesario para GruaDSM
+    initSelectSubgrupo(selectOpcion.value, selectSubgrupo, selectGrupo.value);
      //el valor divNavSup es necesario para GruaDSMNoche, eliminar el select subgrupo
-    initDivNavSup(select_opcion.value, divNavSup);
-    initRotulos(select_opcion.value, rotulosSubgrupo);
+    initDivNavSup(selectOpcion.value, divNavSup);
+    initRotulos(selectOpcion.value, rotulosSubgrupo);
     nuevaFecha();
 }
 
 function opcion(){
     const elementoActivo = document.querySelector('input[name="opcion"]:checked');
     if(elementoActivo.value === 'Num') {
-        select_num.disabled = false;
-        select_ltr.disabled = true;
+        selectNum.disabled = false;
+        selectLtr.disabled = true;
     } else if(elementoActivo.value === 'Ltr') {
-        select_num.disabled = true;
-        select_ltr.disabled = false;
+        selectNum.disabled = true;
+        selectLtr.disabled = false;
     }
 }
 
@@ -231,9 +231,9 @@ function poblarSelect(select, items) {
 //      como pura estructura. Debe correr ANTES de TomSelect (la librería
 //      fotografía las <option> al construirse).
 function poblarSelectsEstaticos() {
-    poblarSelect(select_opcion, CATEGORIAS);
-    poblarSelect(select_num, NUMEROS_REFUERZO);
-    poblarSelect(select_ltr, LETRAS_REFUERZO);
+    poblarSelect(selectOpcion, CATEGORIAS);
+    poblarSelect(selectNum, NUMEROS_REFUERZO);
+    poblarSelect(selectLtr, LETRAS_REFUERZO);
 }
 
 // WHY: ventana deslizante de años (-2 atrás, +10 adelante desde el año en
@@ -244,18 +244,18 @@ function poblarSelectYear() {
     const actual = new Date().getFullYear();
     const years = [];
     for (let y = actual - 2; y <= actual + 10; y++) years.push(y);
-    poblarSelect(select_year, years);
-    select_year.value = actual;
+    poblarSelect(selectYear, years);
+    selectYear.value = actual;
 }
 
 poblarSelectsEstaticos();
 poblarSelectYear();
 
 btn.addEventListener('click', nuevaFecha);
-select_opcion.addEventListener('change', initCalendario);
-select_grupo.addEventListener('change', () => {
-    if (select_opcion.value === 'GruaDSM') {
-        initSelectSubgrupo(select_opcion.value, select_subgrupo, select_grupo.value);
+selectOpcion.addEventListener('change', initCalendario);
+selectGrupo.addEventListener('change', () => {
+    if (selectOpcion.value === 'GruaDSM') {
+        initSelectSubgrupo(selectOpcion.value, selectSubgrupo, selectGrupo.value);
     }
 });
 
@@ -269,7 +269,7 @@ document.getElementById("rdLtr").addEventListener('click', opcion);
 initCalendario();
 
 // WHY: inicializar Tom Select DESPUÉS de la primera render — para entonces
-//      select_grupo y select_subgrupo ya están poblados, y TomSelect copia
+//      selectGrupo y selectSubgrupo ya están poblados, y TomSelect copia
 //      las <option> existentes a su estado interno. controlInput:null oculta
 //      la búsqueda (las listas son cortas y fijas, sería un cuadro de texto
 //      de adorno). dropdownParent:'body' saca el menú del stacking context
@@ -282,5 +282,5 @@ const tomConfig = {
     create: false,
     dropdownParent: 'body',
 };
-[select_opcion, select_year, select_grupo, select_subgrupo, select_num, select_ltr]
+[selectOpcion, selectYear, selectGrupo, selectSubgrupo, selectNum, selectLtr]
     .forEach(el => new TomSelect(el, tomConfig));
