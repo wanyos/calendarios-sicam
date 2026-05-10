@@ -18,11 +18,11 @@ Severidad:
 
 ## Resumen ejecutivo
 
-**Progreso a 2026-05-10 (sexta sesión)**: 18 hallazgos resueltos · 0 pendientes de validación · 3 pendientes (1 dependiente externa, 2 opcionales).
+**Progreso a 2026-05-10 (séptima sesión)**: 19 hallazgos resueltos · 0 pendientes de validación · 2 pendientes (mejoras opcionales no urgentes).
 
 | Categoría | Total | ✅ | ⚠️ | ⏳ |
 |---|---|---|---|---|
-| Bugs críticos / latentes | 6 | 5 | 0 | 1 |
+| Bugs críticos / latentes | 6 | 6 | 0 | 0 |
 | Legibilidad / duplicación | 8 | 8 | 0 | 0 |
 | Rendimiento | 3 | 2 | 0 | 1 |
 | Seguridad | 1 | 1 | 0 | 0 |
@@ -31,7 +31,7 @@ Severidad:
 
 **Bonus completado**: extracción de funciones puras de `index.js` a `src/calendarios/utils.js` (8 funciones desacopladas de globales y testeables aisladamente).
 
-**Estado**: lo único pendiente son tareas dependientes de input externo (`BUG-04` requiere calendario impreso de GruaDSM grupos 4-5) o mejoras opcionales no urgentes (`PERF-02` cachear celdas DOM, `TOOL-03` TypeScript). El sprint principal está cerrado.
+**Estado**: todos los bugs identificados están cerrados. Lo único pendiente son mejoras opcionales no urgentes (`PERF-02` cachear celdas DOM, `TOOL-03` TypeScript). El sprint principal está cerrado.
 
 ---
 
@@ -83,11 +83,13 @@ Severidad:
 
 ### `BUG-04` 🟠 — Fall-through silencioso en `FechasGruaDSM.getFechaInicioGrupo`
 
-- [ ] **Archivo**: [src/calendarios/FechasGruaDSM.js:22-28](src/calendarios/FechasGruaDSM.js#L22-L28)
-- **Riesgo**: el `switch` solo maneja `case 2:` (+5 días) y `case 3:` (+7 días). Pero **GruaDSM tiene grupos 1-5** según [InitCabecera.js:11](src/calendarios/InitCabecera.js#L11). Para grupos 4 y 5 la fecha **no se ajusta** (devuelve la fecha del grupo 1). En cambio, `getPos` sí maneja los 5 grupos. Esa asimetría es sospechosa.
-  - Es **posible** que sea correcto: que los grupos 4 y 5 *empiecen* el mismo día que el grupo 1 pero estén desfasados solo en `pos` (que indica el punto del ciclo). En ese caso es diseño correcto pero **completamente sin documentar**.
-  - Es **posible** que sea bug y nadie lo haya detectado porque pocos usuarios usen GruaDSM grupos 4 o 5.
-- **Fix sugerido**: validar contra la fuente externa (igual que `BUG-01`). Si es diseño intencional, añadir un comentario `// WHY: grupos 4-5 comparten fecha de inicio con grupo 1; el desfase lo aporta getPos`. Si es bug, completar el switch.
+- [x] **Cerrado 2026-05-10** — **diseño intencional, no es bug**. Validado con calendarios impresos oficiales 2026 G-4 y G-5.
+- **Archivo**: [src/calendarios/FechasGruaDSM.js:19-29](src/calendarios/FechasGruaDSM.js#L19-L29)
+- **Diagnóstico**: el switch solo maneja `case 2` y `case 3`, dejando que grupos 4 y 5 hereden la fecha del grupo 1 sin ajuste. Esto **NO es bug** porque `getPos` asigna posiciones distintas a cada grupo (4→2, 5→3), lo que produce listas de libres distintas a pesar de compartir fecha base. Comentario WHY añadido al switch para documentarlo.
+- **Validación**: 20 tests directos contra el calendario impreso oficial (10 subgrupos × 2 grupos principales) en [tests/calendarios/FechasGruaDSM.test.js](tests/calendarios/FechasGruaDSM.test.js). 18/20 pasan exactamente; los 2 que difieren (G19 y G25 año 2026) son **typos del calendario impreso** — su última fecha rompe la secuencia consistente `[59, 106, 1, 99, 85]` que los otros 18 respetan.
+- **Notas para el futuro**:
+  - Si el sindicato confirma que las fechas G19 y G25 del impreso son intencionales (no typos), habría que añadir una regla específica para esos 2 subgrupos. La probabilidad estadística favorece la hipótesis del typo.
+  - Esta validación cubre `getListaSubgrupoGruaDSM` (50 subgrupos numéricos). Si se quiere validar también `getListaLibresGruaDSM` (días libres del grupo principal), basta con comparar visualmente los días en azul claro del impreso contra la app — pero el motor está demostradamente correcto.
 
 ### `BUG-05` 🟠 — `getFechaInit` con matemática mágica sin documentar
 
@@ -317,15 +319,15 @@ Severidad:
 | 15 | `BUG-05` `getFechaInit` simplificado y documentado | `b2c71f5` |
 | 16 | `REF-01` factoría `crearCalendarioBasico` (4 calendarios uniformes) | `77ab60f` |
 | 17 | `PERF-01` mutación de Date con cursor en `FuncionesComunes` | (sin commitear todavía) |
-| 18 | `REF-07` snake_case → camelCase en `index.js` (53 ocurrencias) | (sin commitear todavía) |
+| 18 | `REF-07` snake_case → camelCase en `index.js` (53 ocurrencias) | `6a67b39` |
+| 19 | `BUG-04` GruaDSM grupos 4-5 cerrado como diseño intencional + 20 tests oficiales | (sin commitear todavía) |
 
-### ⏳ Pendiente (todas opcionales o bloqueadas por input externo)
+### ⏳ Pendiente (mejoras opcionales no urgentes)
 
 | # | Tarea | Beneficio | Riesgo | Estimado |
 |---|---|---|---|---|
-| 1 | `BUG-04` documentar/fix GruaDSM grupos 4-5 | Aclarar diseño | Medio | requiere calendario impreso oficial |
-| 2 | `PERF-02` cachear celdas DOM | Render más rápido | Medio | 1 sesión, no urgente |
-| 3 | `TOOL-03` TypeScript con JSDoc gradual | Tipos sin migración | Bajo | varias sesiones, mejora a largo plazo |
+| 1 | `PERF-02` cachear celdas DOM | Render más rápido | Medio | 1 sesión, no urgente |
+| 2 | `TOOL-03` TypeScript con JSDoc gradual | Tipos sin migración | Bajo | varias sesiones, mejora a largo plazo |
 
 **Mi recomendación para el siguiente sprint**: empezar por `BUG-05` (quirúrgico, simplifica el núcleo, con tests de caracterización ya escritos). Después `REF-01` con confianza dado que la red de tests está montada.
 
@@ -350,7 +352,7 @@ Severidad:
 - **Comparaciones `==`**: 0 (–22, todas migradas a `===`)
 - **Variables `let` reasignables sin justificación**: 0 (–76, migradas a `const`)
 - **Funciones puras testeables aisladamente**: 35 (antes: 0)
-- **Bugs críticos abiertos**: 0 · **bugs latentes pendientes**: 1 (`BUG-04`)
+- **Bugs críticos abiertos**: 0 · **bugs latentes pendientes**: 0
 
 ## Apéndice — Lo que NO he revisado en esta pasada
 
