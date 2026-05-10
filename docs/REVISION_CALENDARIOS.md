@@ -18,12 +18,12 @@ Severidad:
 
 ## Resumen ejecutivo
 
-**Progreso a 2026-05-10 (cuarta sesión)**: 15 hallazgos resueltos · 0 pendientes de validación · 4 pendientes (1 refactor mayor, 1 dependiente de fuente externa, 2 cosmético/opcional).
+**Progreso a 2026-05-10 (quinta sesión)**: 16 hallazgos resueltos · 0 pendientes de validación · 3 pendientes (cosmético/opcional/dependiente externa).
 
 | Categoría | Total | ✅ | ⚠️ | ⏳ |
 |---|---|---|---|---|
 | Bugs críticos / latentes | 6 | 5 | 0 | 1 |
-| Legibilidad / duplicación | 8 | 6 | 0 | 2 |
+| Legibilidad / duplicación | 8 | 7 | 0 | 1 |
 | Rendimiento | 3 | 1 | 0 | 2 |
 | Seguridad | 1 | 1 | 0 | 0 |
 | Tooling | 3 | 2 | 0 | 1 |
@@ -31,7 +31,7 @@ Severidad:
 
 **Bonus completado**: extracción de funciones puras de `index.js` a `src/calendarios/utils.js` (8 funciones desacopladas de globales y testeables aisladamente).
 
-**Próximo paso recomendado**: `REF-01` (factoría `crearCalendario`) — el último refactor mayor del plan, ahora viable porque la red de tests está completa.
+**Próximo paso recomendado**: tareas pequeñas que cierran el sprint — `REF-07` (naming uniforme camelCase) y `PERF-01` (mutar Date en bucles). El resto (`BUG-04`, `PERF-02`, `TOOL-03`) requiere fuente externa o son refactores no urgentes.
 
 ---
 
@@ -110,36 +110,18 @@ Severidad:
 
 ## 🟡 Mejoras de legibilidad y mantenibilidad
 
-### `REF-01` 🟡 — Patrón duplicado en 8 archivos `FechasXxx.js`
+### `REF-01` 🟡 — Patrón duplicado en archivos `FechasXxx.js`
 
-- [ ] **Archivos afectados**: `FechasBuho.js`, `FechasConductor.js`, `FechasGrua.js`, `FechasGruaDSM.js`, `FechasGruaDSMNoche.js`, `FechasInspector.js`, `FechasInspectorNoche.js`, `FechasParkingDSM100.js`, `FechasParkingDSM50.js`
-- **Problema**: cada archivo repite la misma estructura:
-  1. Función pública `getListaLibresXxx(year, grupo)` que define `fechaInit`, `secuenciaLibres`, `secuenciaTrabajo`, `totalSecuencia`, ajusta por grupo y delega.
-  2. `getFechaInicioGrupo` con un `switch(grupo)` que aplica un offset distinto.
-  3. `getPos` con otro `switch(grupo)`.
-  4. Array de fechas iniciales por subgrupo.
-  5. Función pública `getListaSubgrupoXxx`.
-  6. `getFechaSubgrupoYYYY` / `getNumeroSubgrupo` / `getPosSecuencia` con switches casi idénticos.
-- **Coste actual**: si se descubre un bug en uno de los patrones, hay que aplicar el fix en N sitios. Si se quiere añadir un calendario nuevo, hay que copiar-pegar y modificar. Mucha superficie para errores.
-- **Fix sugerido**: una **factoría declarativa**:
-  ```js
-  // FechasFactory.js
-  export function crearCalendario({ fechaInicial, secuenciaLibres, secuenciaTrabajo, totalSecuencia, offsetsPorGrupo, posPorGrupo, subgrupos, ... }) {
-    return {
-      getListaLibres: (year, grupo) => { ... },
-      getListaSubgrupo: (year, grupo, subgrupo) => { ... },
-      ...
-    };
-  }
-  // FechasConductor.js queda en una decena de líneas:
-  export const calConductor = crearCalendario({
-    fechaInicial: new Date(2020, 0, 1),
-    secuenciaLibres: [2, 3, 2, 3],
-    ...
-  });
-  ```
-  Reduce ~70% de LOC de este directorio y centraliza el cambio de bugs.
-- **Cuidado**: este refactor es invasivo. Hacer **después** de `TOOL-02` (tests), porque sin tests no hay manera segura de garantizar equivalencia funcional.
+- [x] **Resuelto 2026-05-10 (parcial)** — factoría `crearCalendarioBasico` en `src/calendarios/FechasFactory.js` aplicada a los **4 calendarios uniformes**: `FechasConductor.js`, `FechasInspector.js`, `FechasInspectorNoche.js` y `FechasBuho.js`.
+- **Decisión 80/20**: el plan original pedía aplicar la factoría a **9 calendarios**. Se descartó porque los otros 5 (`FechasGrua.js`, `FechasGruaDSM.js`, `FechasGruaDSMNoche.js`, `FechasParkingDSM_*.js`, `FechasRefuerzoNocturno.js`) tienen estructuras suficientemente distintas como para que adaptar la factoría a sus casos haría la factoría más confusa que el código duplicado actual.
+- **Resultados**:
+  - LOC en los 4 archivos migrados: 443 → 237 (–46%)
+  - + factoría nueva: 98 LOC
+  - **Ahorro neto: 108 LOC** (24% del directorio afectado)
+  - Cada calendario migrado es ahora **declarativo**: configuración (matrices de fechas, secuencias, mapeo getDay→pos) en lugar de wiring imperativo.
+- **Beneficio principal — no es LOC**: la lógica de propagación del calendario vive ahora en **un solo sitio** (`FechasFactory.js` + `FechasConductorInspector.js`). Si se descubre un bug en cómo se ensambla `Libres + Subgrupo + SubComunes`, el fix está centralizado. Añadir un calendario nuevo del patrón Conductor/Inspector es ahora trivial.
+- **Verificación**: 636 tests pasan idénticos antes y después (incluida la validación oficial de Inspector_Noche grupo 4).
+- **Archivos**: [src/calendarios/FechasFactory.js](src/calendarios/FechasFactory.js) (nuevo) + 4 archivos migrados.
 
 ### `REF-02` 🟡 — Switches `letra → posición` repetidos
 
@@ -340,20 +322,18 @@ Severidad:
 | 12 | `REF-06` comentario corregido en `FechasBuho.js` | `0aee9cc` |
 | 13 | `REF-08` `data-rol` para `initRotulos` | `0aee9cc` |
 | 14 | `BUG-01` validación oficial Inspector_Noche grupos 4 y 5 | `fa5701e` |
-| 15 | `BUG-05` `getFechaInit` simplificado y documentado | (sin commitear todavía) |
+| 15 | `BUG-05` `getFechaInit` simplificado y documentado | `b2c71f5` |
+| 16 | `REF-01` factoría `crearCalendarioBasico` (4 calendarios uniformes) | (sin commitear todavía) |
 
 ### ⏳ Pendiente
 
-Orden recomendado (refactor mayor primero, cosmético al final):
-
 | # | Tarea | Beneficio | Riesgo | Estimado |
 |---|---|---|---|---|
-| 1 | **`REF-01`** factoría `crearCalendario` | **Refactor mayor (~600 LOC menos)** | Medio (con tests) | 1-2 sesiones |
-| 2 | `PERF-01` mutar Date en bucles de `FuncionesComunes` | Marginal | Medio | 20 min |
-| 3 | `REF-07` naming uniforme camelCase | Cosmético | Nulo | 15 min |
-| 4 | `BUG-04` documentar/fix GruaDSM grupos 4-5 | Aclarar diseño | Medio (validación externa) | requiere fuente |
-| 5 | `PERF-02` cachear celdas DOM | Render más rápido | Medio | 1 sesión |
-| 6 | `TOOL-03` TypeScript con JSDoc gradual | Tipos sin migración | Bajo | varias sesiones |
+| 1 | `PERF-01` mutar Date en bucles de `FuncionesComunes` | Marginal | Medio | 20 min |
+| 2 | `REF-07` naming uniforme camelCase | Cosmético | Nulo | 15 min |
+| 3 | `BUG-04` documentar/fix GruaDSM grupos 4-5 | Aclarar diseño | Medio (validación externa) | requiere fuente |
+| 4 | `PERF-02` cachear celdas DOM | Render más rápido | Medio | 1 sesión |
+| 5 | `TOOL-03` TypeScript con JSDoc gradual | Tipos sin migración | Bajo | varias sesiones |
 
 **Mi recomendación para el siguiente sprint**: empezar por `BUG-05` (quirúrgico, simplifica el núcleo, con tests de caracterización ya escritos). Después `REF-01` con confianza dado que la red de tests está montada.
 
