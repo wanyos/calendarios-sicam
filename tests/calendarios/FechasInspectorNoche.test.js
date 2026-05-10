@@ -11,22 +11,10 @@ import {
   getListaSubgrupoInspectorNoche,
   getListaSubComunesInspectorNoche,
 } from '../../src/calendarios/FechasInspectorNoche.js';
+import { YEAR, expectArrayDeFechasDelAnyo } from '../helpers.js';
 
-const YEAR = 2026;
 const GRUPOS = [1, 2, 3, 4, 5];
 const SUBGRUPOS = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
-
-// WHY: helper de aserciones comunes a los 3 puntos de entrada — todos
-//      devuelven un array de Date del año pedido. Si rompemos cualquiera
-//      de estas garantías, hay un bug en el núcleo de FuncionesComunes.
-function expectArrayDeFechasDelAnyo(lista, year) {
-  expect(Array.isArray(lista)).toBe(true);
-  expect(lista.length).toBeGreaterThan(0);
-  for (const fecha of lista) {
-    expect(fecha).toBeInstanceOf(Date);
-    expect(fecha.getFullYear()).toBe(year);
-  }
-}
 
 describe('FechasInspectorNoche — getListaLibresInspectorNoche', () => {
   for (const grupo of GRUPOS) {
@@ -42,7 +30,7 @@ describe('FechasInspectorNoche — getListaSubgrupoInspectorNoche', () => {
     for (const subgrupo of SUBGRUPOS) {
       it(`grupo ${grupo} subgrupo ${subgrupo}: array no vacío de Date del año ${YEAR}`, () => {
         const lista = getListaSubgrupoInspectorNoche(YEAR, grupo, subgrupo);
-        expectArrayDeFechasDelAnyo(lista, YEAR);
+        expectArrayDeFechasDelAnyo(lista);
       });
     }
   }
@@ -53,7 +41,7 @@ describe('FechasInspectorNoche — getListaSubComunesInspectorNoche', () => {
     for (const subgrupo of SUBGRUPOS) {
       it(`grupo ${grupo} subgrupo ${subgrupo}: array no vacío de Date del año ${YEAR}`, () => {
         const lista = getListaSubComunesInspectorNoche(YEAR, grupo, subgrupo);
-        expectArrayDeFechasDelAnyo(lista, YEAR);
+        expectArrayDeFechasDelAnyo(lista);
       });
     }
   }
