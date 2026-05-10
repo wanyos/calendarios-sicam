@@ -8,6 +8,14 @@ import 'tom-select/dist/css/tom-select.default.css';
 import { getDatosListaLibres, getDatosListaSubgrupo, getDatosListaSubComunes } from './calendarios/DatosFechas.js';
 import { initSelectGrupo, initSelectSubgrupo, initRotulos, initDivNavSup, initCajaRefuerzo } from './calendarios/InitCabecera.js';
 import { CATEGORIAS, NUMEROS_REFUERZO, LETRAS_REFUERZO } from './calendarios/Constantes.js';
+import {
+  claveFecha,
+  startDay,
+  getTotalDays,
+  getNombre,
+  getArrayMes,
+  comprobarDia,
+} from './calendarios/utils.js';
 
 let currentDate;
 const titulo = document.getElementById('titulo');
@@ -25,99 +33,35 @@ const select_subgrupo = document.getElementById("select_subgrupo");
 const select_num = document.getElementById('select-num');
 const select_ltr = document.getElementById('select-ltr');
 
-let listaLibresYear = [];
-let listaSubgrupoYear = [];
-let listaSubComunesYear = [];
-
-
-/*dia que empieza el mes*/
-function startDay(monthNumber) {
-    const start = new Date(currentDate.getFullYear(), monthNumber - 1, 1);
-    return ((start.getDay() - 1) === -1) ? 6 : start.getDay() - 1;
-}
-
-
-/*Anyo bisiesto*/
-function isLeap() {
-    return ((currentDate.getFullYear() % 100 !== 0) && (currentDate.getFullYear() % 4 === 0)
-        || (currentDate.getFullYear() % 400 === 0));
-}
-
-
-
-/*total dias de mes*/
-function getTotalDays(month) {
-    if (month === 1 || month === 3 || month === 5 || month === 7 || month === 8 || month === 10 || month === 12) {
-        return 31;
-    } else if (month === 4 || month === 6 || month === 9 || month === 11) {
-        return 30;
-    } else {
-        return isLeap() ? 29 : 28;
-    }
-}
-
-const comprobarDia = (numDia, mes) => {
-    if (numDia > 0) {
-        if (listaLibresYear.length > 0 && comprobarArray(listaLibresYear, numDia, mes)) {
-            listaLibresYear.shift();
-            return "libres";
-        } else if (listaSubgrupoYear !== undefined && listaSubgrupoYear.length > 0 && comprobarArray(listaSubgrupoYear, numDia, mes)) {
-            listaSubgrupoYear.shift();
-            return "subgrupo";
-        } else if (listaSubComunesYear !== undefined && listaSubComunesYear.length > 0 && comprobarArray(listaSubComunesYear, numDia, mes)) {
-            listaSubComunesYear.shift();
-            const sub = select_subgrupo.value;
-            if (sub === "A" || sub === "C" || sub === "E" || sub === "G" || sub === "I") {
-                return "sub1";
-            } else {
-                return "sub2";
-            }
-        }
-    }
-
-}
-
-function comprobarArray(array, numDia, mes) {
-    if (parseInt(numDia) === array[0].getDate() && (mes - 1) === array[0].getMonth()) {
-        return true;
-    }
-    return false;
-}
-
-
-
-function getArrayMes(espacios, totalDias) {
-    const arrayMes = new Array();
-    let contador = 0;
-    let num_dia = 1;
-
-    for (let a = 0; a < 42; a++) {
-        if (contador <= espacios || num_dia > totalDias) {
-            arrayMes.push(".");
-            contador++;
-        } else {
-            arrayMes.push("" + num_dia++);
-        }
-    }
-    return arrayMes;
-}
+// WHY: las listas de fechas se almacenan como Set<string> con clave canónica
+//      "YYYY-M-D" (mes 0-indexed, día 1-31). Esto permite:
+//        - lookup O(1) en comprobarDia (set.has(clave))
+//        - independencia del orden de pintado (antes el algoritmo dependía
+//          de que los meses y días se procesaran en orden creciente porque
+//          consumía con .shift())
+//        - re-renderizar parcialmente sin reconstruir las listas
+let setLibresYear = new Set();
+let setSubgrupoYear = new Set();
+let setSubComunesYear = new Set();
 
 
 function rellenarDias(tabla, mes) {
-    const numeroDias = getTotalDays(mes);
-    const espacios = startDay(mes) - 1;
+    const year = currentDate.getFullYear();
+    const numeroDias = getTotalDays(mes, year);
+    const espacios = startDay(mes, year) - 1;
     let tipoDia;
     let fragment = document.createDocumentFragment();
 
     const arrayMes = getArrayMes(espacios, numeroDias);
     let diaSemana = 0;
+    const sets = { libres: setLibresYear, subgrupo: setSubgrupoYear, subComunes: setSubComunesYear };
     for (const d of arrayMes) {
         if (diaSemana === 0) {
             fragment = document.createElement("tr");
         }
         const columna = document.createElement("td");
 
-        tipoDia = comprobarDia(d, mes);
+        tipoDia = comprobarDia(d, mes, year, sets, select_subgrupo.value);
 
         const dia = document.createTextNode(d);
         columna.appendChild(dia);
@@ -152,25 +96,8 @@ function rellenarTablaCabecera(tabla) {
 
 
 
-function getNombre(n) {
-    switch (n) {
-        case 1: return "Enero";
-        case 2: return "Febrero";
-        case 3: return "Marzo";
-        case 4: return "Abril";
-        case 5: return "Mayo";
-        case 6: return "Junio";
-        case 7: return "Julio";
-        case 8: return "Agosto";
-        case 9: return "Septiembre";
-        case 10: return "Octubre";
-        case 11: return "Noviembre";
-        case 12: return "Diciembre";
-    }
-}
-
 /**
-* Crea una tabla para cada mes 
+* Crea una tabla para cada mes
 * llama a rellenar cabecera la cual rellena la cabecera de la tabla con los dias de la semana
 * @param {*} cont_tabla contenedor div que contendra la tabla
 * @param {*} nombre nombre del mes
@@ -226,12 +153,16 @@ function setDatos() {
     const subgrupo = select_subgrupo.value;
     const grupoDos = getGrupoDos();
 
-    listaLibresYear = getDatosListaLibres(select_opcion.value, year, grupo, grupoDos);
-    //console.log(listaLibresYear)
-    listaSubgrupoYear = getDatosListaSubgrupo(select_opcion.value, year, grupo, subgrupo);
-    //console.log(listaSubgrupoYear);
-    listaSubComunesYear = getDatosListaSubComunes(select_opcion.value, year, grupo, subgrupo);
-    //console.log(listaSubComunesYear);
+    // WHY: algunas funciones de DatosFechas devuelven undefined para tipos
+    //      que no aplican (ej. getDatosListaSubgrupo no maneja GruaDSM_Noche).
+    //      ?? [] blinda contra eso sin tener que validar en cada caller.
+    const listaLibres = getDatosListaLibres(select_opcion.value, year, grupo, grupoDos) ?? [];
+    const listaSubgrupo = getDatosListaSubgrupo(select_opcion.value, year, grupo, subgrupo) ?? [];
+    const listaSubComunes = getDatosListaSubComunes(select_opcion.value, year, grupo, subgrupo) ?? [];
+
+    setLibresYear = new Set(listaLibres.map(claveFecha));
+    setSubgrupoYear = new Set(listaSubgrupo.map(claveFecha));
+    setSubComunesYear = new Set(listaSubComunes.map(claveFecha));
 }
 
 function getGrupoDos(){
