@@ -71,21 +71,6 @@ body {
   overflow-x: hidden;
 }
 
-/* WHY: el logo de fondo se monta como pseudo-elemento fijo y muy tenue; así no
-   estira el body ni interfiere con la grid del contenido. */
-body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background-image: url(./img/logo-transparente.png);
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: min(60vmin, 600px);
-  opacity: 0.04;
-  pointer-events: none;
-  z-index: 0;
-}
-
 img {
   display: block;
   max-width: 100%;
@@ -321,8 +306,6 @@ button {
   max-width: var(--max-width);
   margin: 0 auto;
   padding: var(--space-5) var(--space-5);
-  position: relative;
-  z-index: 1;
 }
 
 /* =============================================================================

@@ -14,16 +14,20 @@
     <link href="https://fonts.googleapis.com/css2?family=Catamaran:wght@400;500;600;700&family=Dosis:wght@500;600;700;800&display=swap" rel="stylesheet">
 
     <link rel="stylesheet" href="./estilo.css"/>
-    <title>Calendarios · SICAM</title>
+    <!-- WHY: title neutro como fallback. index.js lo sobrescribe con
+         branding.title al arrancar (SICAM o el white-label). -->
+    <title>Calendarios</title>
   </head>
 
   <body translate="no">
 
+    <!-- WHY: el logo (.hero__logo) y el eyebrow (.hero__eyebrow) los
+         inyecta index.js desde @branding al arrancar. Si branding.enabled
+         es false (build white-label) no se inyecta nada y queda solo
+         el .hero__text con el título. -->
     <header class="hero">
       <div class="hero__inner">
-        <img class="hero__logo" src="./img/logo-sicam.png" alt="SICAM Madrid"/>
         <div class="hero__text">
-          <span class="hero__eyebrow">Sindicato de Conductores · EMT Madrid</span>
           <h2 id="titulo" class="hero__title"></h2>
         </div>
       </div>
@@ -94,9 +98,10 @@
       <div id="container-tabla" class="container-tabla"></div>
     </main>
 
-    <footer class="footer">
-      <p>© Sicam EMT · Madrid</p>
-    </footer>
+    <!-- WHY: el <p> con el texto del footer lo inyecta index.js desde
+         @branding si está definido. Si no, queda como banda decorativa
+         vacía (la altura la da el padding del .footer en CSS). -->
+    <footer class="footer"></footer>
 
     <script type="module" src="./index.js"></script>
   </body>

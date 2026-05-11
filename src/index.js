@@ -16,6 +16,7 @@ import {
   getArrayMes,
   comprobarDia,
 } from './calendarios/utils.js';
+import { applyBranding } from './branding/apply.js';
 
 let currentDate;
 const titulo = document.getElementById('titulo');
@@ -247,6 +248,12 @@ function poblarSelectYear() {
     poblarSelect(selectYear, years);
     selectYear.value = actual;
 }
+
+// WHY: el branding (logo + textos en hero/footer/title) se inyecta antes que
+//      cualquier otra cosa visual para evitar el flash de "HTML neutro → HTML
+//      con marca". El módulo @branding lo resuelve Vite a sicam.js o
+//      whitelabel.js según --mode (ver vite.config.js).
+applyBranding();
 
 poblarSelectsEstaticos();
 poblarSelectYear();

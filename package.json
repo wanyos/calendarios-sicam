@@ -6,7 +6,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:wl": "vite --mode whitelabel",
     "build": "vite build",
+    "build:wl": "vite build --mode whitelabel",
     "preview": "vite preview",
     "lint": "eslint src/",
     "lint:fix": "eslint src/ --fix",
