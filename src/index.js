@@ -197,12 +197,22 @@ function initCalendario() {
 
 function opcion(){
     const elementoActivo = document.querySelector('input[name="opcion"]:checked');
-    if(elementoActivo.value === 'Num') {
-        selectNum.disabled = false;
-        selectLtr.disabled = true;
-    } else if(elementoActivo.value === 'Ltr') {
-        selectNum.disabled = true;
-        selectLtr.disabled = false;
+    const esNum = elementoActivo.value === 'Num';
+    setSelectEnabled(selectNum, esNum);
+    setSelectEnabled(selectLtr, !esNum);
+}
+
+// WHY: Tom Select fotografía select.disabled SOLO al construirse; cambiar la
+//      propiedad nativa después no propaga al wrapper, por eso el radio "Ltr"
+//      no habilitaba el dropdown. Usamos la API del wrapper cuando existe y
+//      la propiedad nativa como fallback para la primera llamada (antes de
+//      que TomSelect esté inicializado).
+function setSelectEnabled(select, enabled){
+    if (select.tomselect) {
+        if (enabled) select.tomselect.enable();
+        else select.tomselect.disable();
+    } else {
+        select.disabled = !enabled;
     }
 }
 

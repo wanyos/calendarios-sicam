@@ -482,6 +482,19 @@ table td.sub2     { background-color: var(--color-sub2);     color: white; font-
   color: var(--color-text);
 }
 
+/* WHY: por defecto .ts-control mete sólo 8px de padding horizontal: con un
+   sólo carácter visible (p.ej. 'J') la letra queda pegada al borde izquierdo
+   y se confunde con 'I'. Subimos el padding-left para darle aire — pero
+   manteniendo alineación a la izquierda, que es el estándar de formularios y
+   case con la categoría principal (texto largo). El padding-right lo gestiona
+   --ts-pr-caret del tema default (no lo tocamos). */
+.ts-wrapper.single .ts-control {
+  padding-left: 0.85rem;
+}
+.ts-dropdown .option {
+  padding-left: 0.85rem;
+}
+
 .ts-wrapper.single.focus .ts-control {
   border-color: var(--color-brand);
   box-shadow: 0 0 0 3px rgba(39, 108, 194, 0.18);

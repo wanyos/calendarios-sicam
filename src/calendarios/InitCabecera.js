@@ -150,9 +150,17 @@ function setDatosSelect(select, array) {
     //      solo. clearOptions+addOptions+setValue rebuilen su dropdown y dejan
     //      seleccionado el primer elemento (replica del comportamiento nativo:
     //      tras añadir options, select.value apunta al primero por defecto).
+    //      clearOptions(() => false) fuerza el borrado de TODAS las options;
+    //      sin filtro, Tom Select preserva la option actualmente seleccionada
+    //      (clearFilter por defecto la considera "en uso") y al re-añadirla
+    //      mantiene su $order antiguo — el dropdown la pinta primero aunque
+    //      ya no corresponda al nuevo conjunto (p.ej. queda una 'J' o '1'
+    //      flotando al cambiar de categoría). clear() limpia primero los
+    //      items seleccionados para que ningún valor previo quede colgando.
     if (select.tomselect) {
         const ts = select.tomselect;
-        ts.clearOptions();
+        ts.clear(true);
+        ts.clearOptions(() => false);
         ts.addOptions(array.map(v => ({ value: String(v), text: String(v) })));
         if (array.length > 0) ts.setValue(String(array[0]), true);
         ts.refreshOptions(false);
