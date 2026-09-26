@@ -1,0 +1,19 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "env": {
+    "browser": true,
+    "es2024": true
+  },
+  "categories": {
+    "correctness": "error",
+    "suspicious": "warn"
+  },
+  "rules": {
+    "eslint/eqeqeq": ["error", "always"],
+    "eslint/prefer-const": "error",
+    "eslint/no-var": "error",
+    "eslint/no-undef": "error",
+    "eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }]
+  },
+  "ignorePatterns": ["dist", "node_modules"]
+}
