@@ -12,7 +12,8 @@
     "preview": "vite preview",
     "lint": "oxlint src/",
     "lint:fix": "oxlint src/ --fix",
-    "test": "vitest run"
+    "test": "vitest run",
+    "golden:update": "node tests/golden/generar.js"
   },
   "keywords": [],
   "author": "",
