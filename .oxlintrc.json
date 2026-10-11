@@ -15,5 +15,15 @@
     "eslint/no-undef": "error",
     "eslint/no-unused-vars": ["warn", { "argsIgnorePattern": "^_" }]
   },
+  "overrides": [
+    {
+      "files": ["tests/**/*.js"],
+      "env": { "node": true },
+      "rules": {
+        "unicorn/consistent-function-scoping": "off",
+        "unicorn/no-array-sort": "off"
+      }
+    }
+  ],
   "ignorePatterns": ["dist", "node_modules"]
 }

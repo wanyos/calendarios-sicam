@@ -1,8 +1,8 @@
 {
-  "name": "calendarioslast",
+  "name": "calendarios-sicam",
   "version": "1.0.0",
-  "description": "",
-  "main": "index.js",
+  "description": "Calendarios de turnos por categoría y grupo",
+  "private": true,
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -10,12 +10,13 @@
     "build": "vite build",
     "build:wl": "vite build --mode whitelabel",
     "preview": "vite preview",
-    "lint": "oxlint src/",
-    "lint:fix": "oxlint src/ --fix",
+    "lint": "oxlint src/ tests/",
+    "lint:fix": "oxlint src/ tests/ --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "vitest run",
-    "golden:update": "node tests/golden/generar.js"
+    "golden:update": "node tests/golden/generar.js",
+    "check": "pnpm lint && pnpm format:check && pnpm test"
   },
   "keywords": [],
   "author": "",

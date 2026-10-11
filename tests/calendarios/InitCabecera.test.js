@@ -1,11 +1,7 @@
 // @vitest-environment jsdom
 
 import { describe, it, expect } from 'vitest';
-import {
-  initRotulos,
-  initSelectGrupo,
-  initSelectSubgrupo,
-} from '../../src/calendarios/InitCabecera';
+import { initRotulos, initSelectSubgrupo } from '../../src/calendarios/InitCabecera';
 import { comprobarDia } from '../../src/calendarios/utils';
 
 // replica de los rotulos de src/index.thml
