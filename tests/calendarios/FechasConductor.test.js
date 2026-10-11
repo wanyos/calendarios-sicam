@@ -1,4 +1,4 @@
-import { describe, it } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import {
   getListaLibresConductor,
   getListaSubgrupoConductor,
@@ -27,6 +27,14 @@ describe('FechasConductor — getListaSubgrupoConductor', () => {
       });
     }
   }
+
+  it('B3: un grupo fuera de rango lanza un error claro', () => {
+    expect(() => getListaSubgrupoConductor(2026, 7, 'A')).toThrow('Grupo fuera de rango');
+  });
+
+  it('B4: una letra de subgrupo inexistente lanza un error claro', () => {
+    expect(() => getListaSubgrupoConductor(2026, 1, 'I')).toThrow('Subgrupo fuera de rango');
+  });
 });
 
 describe('FechasConductor — getListaSubComunesConductor', () => {

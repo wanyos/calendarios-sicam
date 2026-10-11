@@ -75,24 +75,30 @@ export function crearCalendarioBasico({ libres, subgrupo, subComunes }) {
 }
 
 // WHY: helper interno — busca la fecha del subgrupo en la matriz por
-//      [grupo-1][indiceLetra]. Si grupo está fuera del rango 1-5,
-//      devuelve la primera columna como fallback (comportamiento
-//      preservado del código original).
+//      [grupo-1][indiceLetra]. Lanza RangeError si el grupo o la letra
+//      no existen en la matriz.
 function getFechaSubgrupo(matriz, grupo, sub) {
-    const pos = letraAIndice(sub);
-    if (grupo >= 1 && grupo <= 5) {
-        return matriz[grupo - 1][pos];
+    if (grupo < 1 || grupo > matriz.length) {
+        throw new RangeError(`Grupo fuera de rango: ${grupo}`);
     }
-    return matriz[grupo - 1][0];
+    const fecha = matriz[grupo - 1][letraAIndice(sub)];
+    if (fecha === undefined) {
+        throw new RangeError(`Subgrupo fuera de rango: ${sub}`);
+    }
+    return fecha;
 }
 
 // WHY: helper interno — la matriz subComunes solo tiene 2 columnas
 //      (ACEGI=0, BDFHJ=1). Las letras impares en orden alfabético
 //      (A,C,E,G,I) van a 0; las pares (B,D,F,H,J) a 1.
 function getFechaSubComunes(matriz, grupo, sub) {
-    const pos = 'BDFHJ'.includes(sub) ? 1 : 0;
-    if (grupo >= 1 && grupo <= 5) {
-        return matriz[grupo - 1][pos];
+    if (grupo < 1 || grupo > matriz.length) {
+        throw new RangeError(`Grupo fuera de rango: ${grupo}`);
     }
-    return matriz[grupo - 1][0];
+    const pos = 'BDFHJ'.includes(sub) ? 1 : 0;
+    const fecha = matriz[grupo - 1][pos];
+    if (fecha === undefined) {
+        throw new RangeError(`Subgrupo fuera de rango: ${sub}`);
+    }
+    return fecha;
 }

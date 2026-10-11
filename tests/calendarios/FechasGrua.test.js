@@ -1,4 +1,4 @@
-import { describe, it } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import {
   getListaLibresGrua,
   getListaSubgrupoGrua,
@@ -26,4 +26,12 @@ describe('FechasGrua — getListaSubgrupoGrua', () => {
       });
     }
   }
+
+  it('B3: un grupo fuera de rango lanza un error claro', () => {
+    expect(() => getListaSubgrupoGrua(2026, 7, 'A')).toThrow('Grupo fuera de rango');
+  });
+
+  it('B4: una letra de subgrupo inexistente lanza un error claro', () => {
+    expect(() => getListaSubgrupoGrua(2026, 1, 'D')).toThrow('Subgrupo fuera de rango');
+  });
 });
