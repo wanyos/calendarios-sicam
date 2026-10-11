@@ -40,6 +40,7 @@ export function initSelectSubgrupo(tipoCalendario, select, select_value) {
     } else if (tipoCalendario === 'GruaDSM') {
         array = getArrayGruaDSM(select_value);
     } else if(tipoCalendario === 'GruaDSM_Noche' || tipoCalendario === 'ParkingDSM_100' || tipoCalendario === 'ParkingDSM_50' || tipoCalendario === 'Refuerzo_Nocturno'){
+        setDatosSelect(select, []);
         return;
     }
     setDatosSelect(select, array);
@@ -58,6 +59,8 @@ export function initRotulos(tipoCalendario, div) {
     const subgrupo = div.querySelector('[data-rol="subgrupo"]');
     const sub1 = div.querySelector('[data-rol="sub1"]');
     const sub2 = div.querySelector('[data-rol="sub2"]');
+
+    subgrupo.textContent = 'Subgrupo';
 
     if(tipoCalendario === 'Conductor' || tipoCalendario === 'Buho'){
         subgrupo.style.display = "block";

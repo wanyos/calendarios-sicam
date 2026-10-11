@@ -100,6 +100,7 @@ export function comprobarDia(numDia, mes, anyo, sets, subgrupoActual) {
   if (sets.libres.has(clave)) return 'libres';
   if (sets.subgrupo.has(clave)) return 'subgrupo';
   if (sets.subComunes.has(clave)) {
-    return 'ACEGI'.includes(subgrupoActual) ? 'sub1' : 'sub2';
+    const esImpar = subgrupoActual && 'ACEGI'.includes(subgrupoActual);
+    return esImpar ? 'sub1' : 'sub2';
   }
 }
