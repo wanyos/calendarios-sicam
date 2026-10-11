@@ -42,8 +42,8 @@ describe('FechasGruaDSM — getListaSubgrupoGruaDSM', () => {
 describe('FechasGruaDSM — validación oficial calendario 2026 (G-4 y G-5)', () => {
   const OFICIAL = {
     // Grupo principal G-4 → subgrupos 4, 9, 14, 19, 24, 29, 34, 39, 44, 49
-    4:  ['2026-04-09', '2026-07-03', '2026-08-31', '2026-12-15', '2026-12-16'],
-    9:  ['2026-03-05', '2026-05-29', '2026-07-27', '2026-11-10', '2026-11-11'],
+    4: ['2026-04-09', '2026-07-03', '2026-08-31', '2026-12-15', '2026-12-16'],
+    9: ['2026-03-05', '2026-05-29', '2026-07-27', '2026-11-10', '2026-11-11'],
     14: ['2026-01-29', '2026-04-24', '2026-06-22', '2026-10-06', '2026-10-07'],
     // 19: oficial dice 2026-12-09 pero rompe la secuencia 99 días
     //     (los otros 18 la respetan). Asumimos typo del impreso.
@@ -55,7 +55,7 @@ describe('FechasGruaDSM — validación oficial calendario 2026 (G-4 y G-5)', ()
     44: ['2026-03-10', '2026-03-11', '2026-06-18', '2026-09-11', '2026-11-09'],
     49: ['2026-02-03', '2026-02-04', '2026-05-14', '2026-08-07', '2026-10-05'],
     // Grupo principal G-5 → subgrupos 5, 10, 15, 20, 25, 30, 35, 40, 45, 50
-    5:  ['2026-04-02', '2026-06-26', '2026-08-24', '2026-12-08', '2026-12-09'],
+    5: ['2026-04-02', '2026-06-26', '2026-08-24', '2026-12-08', '2026-12-09'],
     10: ['2026-02-26', '2026-05-22', '2026-07-20', '2026-11-03', '2026-11-04'],
     15: ['2026-01-22', '2026-04-17', '2026-06-15', '2026-09-29', '2026-09-30'],
     20: ['2026-03-13', '2026-05-11', '2026-08-25', '2026-08-26', '2026-12-03'],
@@ -69,7 +69,8 @@ describe('FechasGruaDSM — validación oficial calendario 2026 (G-4 y G-5)', ()
     50: ['2026-01-27', '2026-01-28', '2026-05-07', '2026-07-31', '2026-09-28'],
   };
 
-  const fechaLocal = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  const fechaLocal = (d) =>
+    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 
   for (const [num, esperadas] of Object.entries(OFICIAL)) {
     it(`subgrupo ${num}: fechas coinciden con calendario oficial`, () => {

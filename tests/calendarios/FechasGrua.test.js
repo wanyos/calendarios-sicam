@@ -1,8 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import {
-  getListaLibresGrua,
-  getListaSubgrupoGrua,
-} from '../../src/calendarios/FechasGrua.js';
+import { getListaLibresGrua, getListaSubgrupoGrua } from '../../src/calendarios/FechasGrua.js';
 import { YEAR, expectArrayDeFechasDelAnyo } from '../helpers.js';
 
 const GRUPOS = [1, 2, 3, 4, 5];

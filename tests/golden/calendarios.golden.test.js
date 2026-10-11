@@ -25,47 +25,49 @@ const golden = JSON.parse(gunzipSync(readFileSync(RUTA_GOLDEN)).toString('utf8')
 const NOMBRE = { '-': 'nada', L: 'Libre', S: 'Subgrupo', 1: 'sub1', 2: 'sub2' };
 
 function describirDiferencias(year, esperado, actual) {
-    const lineas = [];
-    for (let i = 0; i < Math.max(esperado.length, actual.length); i++) {
-        if (esperado[i] !== actual[i]) {
-            lineas.push(`  ${fechaDeIndice(year, i)}: esperado ${NOMBRE[esperado[i]] ?? esperado[i]}, obtenido ${NOMBRE[actual[i]] ?? actual[i]}`);
-        }
+  const lineas = [];
+  for (let i = 0; i < Math.max(esperado.length, actual.length); i++) {
+    if (esperado[i] !== actual[i]) {
+      lineas.push(
+        `  ${fechaDeIndice(year, i)}: esperado ${NOMBRE[esperado[i]] ?? esperado[i]}, obtenido ${NOMBRE[actual[i]] ?? actual[i]}`,
+      );
     }
-    const MAX = 15;
-    const extra = lineas.length > MAX ? `\n  ... y ${lineas.length - MAX} días más` : '';
-    return `${year} (${lineas.length} días distintos):\n${lineas.slice(0, MAX).join('\n')}${extra}`;
+  }
+  const MAX = 15;
+  const extra = lineas.length > MAX ? `\n  ... y ${lineas.length - MAX} días más` : '';
+  return `${year} (${lineas.length} días distintos):\n${lineas.slice(0, MAX).join('\n')}${extra}`;
 }
 
 describe('golden master — integridad', () => {
-    it(`se ejecuta en la zona horaria ${TZ_GOLDEN}`, () => {
-        expect(process.env.TZ).toBe(TZ_GOLDEN);
-        expect(golden.tz).toBe(TZ_GOLDEN);
-    });
+  it(`se ejecuta en la zona horaria ${TZ_GOLDEN}`, () => {
+    expect(process.env.TZ).toBe(TZ_GOLDEN);
+    expect(golden.tz).toBe(TZ_GOLDEN);
+  });
 
-    it('el golden cubre exactamente las combinaciones y años actuales', () => {
-        expect(golden.years).toEqual(YEARS);
-        expect(Object.keys(golden.datos).sort()).toEqual(COMBINACIONES.map(claveCombinacion).sort());
-    });
+  it('el golden cubre exactamente las combinaciones y años actuales', () => {
+    expect(golden.years).toEqual(YEARS);
+    expect(Object.keys(golden.datos).sort()).toEqual(COMBINACIONES.map(claveCombinacion).sort());
+  });
 
-    // WHY: si se añade una categoría a la UI y no a combinaciones.js, su
-    //      calendario quedaría fuera de la red sin que nadie lo note.
-    it('todas las categorías de la UI están cubiertas', () => {
-        const cubiertas = new Set(COMBINACIONES.map(c => c.tipo));
-        expect([...cubiertas].sort()).toEqual(CATEGORIAS.map(c => c.value).sort());
-    });
+  // WHY: si se añade una categoría a la UI y no a combinaciones.js, su
+  //      calendario quedaría fuera de la red sin que nadie lo note.
+  it('todas las categorías de la UI están cubiertas', () => {
+    const cubiertas = new Set(COMBINACIONES.map((c) => c.tipo));
+    expect([...cubiertas].sort()).toEqual(CATEGORIAS.map((c) => c.value).sort());
+  });
 });
 
 describe('golden master — calendarios día a día', () => {
-    for (const combinacion of COMBINACIONES) {
-        const clave = claveCombinacion(combinacion);
-        it(clave, () => {
-            const diferencias = [];
-            for (const year of YEARS) {
-                const esperado = golden.datos[clave][year];
-                const actual = renderAnyo(combinacion, year);
-                if (actual !== esperado) diferencias.push(describirDiferencias(year, esperado, actual));
-            }
-            expect(diferencias, `${clave} ha cambiado:\n${diferencias.join('\n')}`).toEqual([]);
-        });
-    }
+  for (const combinacion of COMBINACIONES) {
+    const clave = claveCombinacion(combinacion);
+    it(clave, () => {
+      const diferencias = [];
+      for (const year of YEARS) {
+        const esperado = golden.datos[clave][year];
+        const actual = renderAnyo(combinacion, year);
+        if (actual !== esperado) diferencias.push(describirDiferencias(year, esperado, actual));
+      }
+      expect(diferencias, `${clave} ha cambiado:\n${diferencias.join('\n')}`).toEqual([]);
+    });
+  }
 });

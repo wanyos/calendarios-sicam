@@ -28,31 +28,30 @@ const MS_POR_DIA = 1000 * 60 * 60 * 24;
  * tests siguen pasando idénticos.
  */
 export const getFechaInit = (year, fechaFin, valorSecuencia) => {
-    // 1. Aproximar fecha en año previo según la heurística.
-    const mesAprox = 12 - valorSecuencia / 30;
-    const fechaAprox = new Date(year - 1, mesAprox, 1);
+  // 1. Aproximar fecha en año previo según la heurística.
+  const mesAprox = 12 - valorSecuencia / 30;
+  const fechaAprox = new Date(year - 1, mesAprox, 1);
 
-    // 2. Caso edge: fechaAprox cae antes que fechaFin → retrocedemos
-    //    un ciclo desde fechaFin para que el bucle pueda arrancar.
-    if (fechaAprox.getTime() < fechaFin.getTime()) {
-        return new Date(
-            fechaFin.getFullYear(),
-            fechaFin.getMonth(),
-            fechaFin.getDate() - valorSecuencia
-        );
-    }
+  // 2. Caso edge: fechaAprox cae antes que fechaFin → retrocedemos
+  //    un ciclo desde fechaFin para que el bucle pueda arrancar.
+  if (fechaAprox.getTime() < fechaFin.getTime()) {
+    return new Date(
+      fechaFin.getFullYear(),
+      fechaFin.getMonth(),
+      fechaFin.getDate() - valorSecuencia,
+    );
+  }
 
-    // 3. Días entre fechaFin y fechaAprox / ciclos completos cabidos.
-    const dias = (fechaAprox.getTime() - fechaFin.getTime()) / MS_POR_DIA;
-    const ciclos = dias / valorSecuencia;
-    const fraccionRestante = 1 - (ciclos % 1);
+  // 3. Días entre fechaFin y fechaAprox / ciclos completos cabidos.
+  const dias = (fechaAprox.getTime() - fechaFin.getTime()) / MS_POR_DIA;
+  const ciclos = dias / valorSecuencia;
+  const fraccionRestante = 1 - (ciclos % 1);
 
-    // 4. Avanzar al inicio del siguiente ciclo completo.
-    const diasParaCompletar = Math.round(fraccionRestante * valorSecuencia);
-    fechaAprox.setDate(fechaAprox.getDate() + diasParaCompletar);
-    return fechaAprox;
+  // 4. Avanzar al inicio del siguiente ciclo completo.
+  const diasParaCompletar = Math.round(fraccionRestante * valorSecuencia);
+  fechaAprox.setDate(fechaAprox.getDate() + diasParaCompletar);
+  return fechaAprox;
 };
-
 
 // WHY: las 3 funciones siguientes mutan internamente un cursor de fecha
 //      con setDate() en lugar de crear un nuevo Date en cada iteración.
@@ -70,72 +69,65 @@ export const getFechaInit = (year, fechaFin, valorSecuencia) => {
 //         apuntarían al Date final.
 
 export const getListaLibres = (year, fechaInit, libres, trabajo, pos) => {
-    const cursor = new Date(fechaInit);
-    const lista = [];
+  const cursor = new Date(fechaInit);
+  const lista = [];
 
-    while (cursor.getFullYear() <= year) {
-        const totalLibres = libres[pos];
-        for (let a = 0; a < totalLibres; a++) {
-            if (cursor.getFullYear() === year) {
-                lista.push(new Date(cursor));
-            }
-            if (a < totalLibres - 1) {
-                cursor.setDate(cursor.getDate() + 1);
-            }
-        }
-        cursor.setDate(cursor.getDate() + trabajo[pos]);
-        pos++;
-        if (pos > libres.length - 1) {
-            pos = 0;
-        }
+  while (cursor.getFullYear() <= year) {
+    const totalLibres = libres[pos];
+    for (let a = 0; a < totalLibres; a++) {
+      if (cursor.getFullYear() === year) {
+        lista.push(new Date(cursor));
+      }
+      if (a < totalLibres - 1) {
+        cursor.setDate(cursor.getDate() + 1);
+      }
     }
-    return lista;
-}
-
+    cursor.setDate(cursor.getDate() + trabajo[pos]);
+    pos++;
+    if (pos > libres.length - 1) {
+      pos = 0;
+    }
+  }
+  return lista;
+};
 
 export const getListaSubgrupo = (year, fechaInit, secuencia, pos) => {
-    const cursor = new Date(fechaInit);
-    const lista = [];
+  const cursor = new Date(fechaInit);
+  const lista = [];
 
-    while (cursor.getFullYear() <= year) {
-        if (cursor.getFullYear() === year) {
-            lista.push(new Date(cursor));
-        }
-        cursor.setDate(cursor.getDate() + secuencia[pos]);
-        pos++;
-        if (pos > secuencia.length - 1) {
-            pos = 0;
-        }
+  while (cursor.getFullYear() <= year) {
+    if (cursor.getFullYear() === year) {
+      lista.push(new Date(cursor));
     }
-    return lista;
-}
-
+    cursor.setDate(cursor.getDate() + secuencia[pos]);
+    pos++;
+    if (pos > secuencia.length - 1) {
+      pos = 0;
+    }
+  }
+  return lista;
+};
 
 export const getListaSubgrupoReduccion = (year, fechaInit, totalSecuencia) => {
-    const cursor = new Date(fechaInit);
-    const lista = [];
+  const cursor = new Date(fechaInit);
+  const lista = [];
 
-    while (cursor.getFullYear() <= year) {
-        if (cursor.getFullYear() === year) {
-            lista.push(new Date(cursor));
-        }
-        cursor.setDate(cursor.getDate() + totalSecuencia);
+  while (cursor.getFullYear() <= year) {
+    if (cursor.getFullYear() === year) {
+      lista.push(new Date(cursor));
     }
+    cursor.setDate(cursor.getDate() + totalSecuencia);
+  }
 
-    return lista;
-}
-
+  return lista;
+};
 
 // WHY: A→0, B→1, ..., Z→25. Sustituye los switches duplicados que vivían
 //      en cada FechasXxx.js. El charCode-65 vale para mayúsculas; minúsculas
 //      las sube a mayúsculas antes. Si la letra es vacía/null o no es A-Z,
 //      devuelve 0 (mismo comportamiento que el default de los switches).
 export const letraAIndice = (letra) => {
-    if (typeof letra !== 'string' || letra.length === 0) return 0;
-    const cc = letra.toUpperCase().charCodeAt(0);
-    return cc >= 65 && cc <= 90 ? cc - 65 : 0;
+  if (typeof letra !== 'string' || letra.length === 0) return 0;
+  const cc = letra.toUpperCase().charCodeAt(0);
+  return cc >= 65 && cc <= 90 ? cc - 65 : 0;
 };
-
-
-
-

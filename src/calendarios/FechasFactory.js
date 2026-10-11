@@ -13,9 +13,9 @@
 
 import { letraAIndice } from './FuncionesComunes.js';
 import {
-    getLibresConductorInspector,
-    getListaSubgrupoConductorInspector,
-    getListaSubComunesConductorInspector,
+  getLibresConductorInspector,
+  getListaSubgrupoConductorInspector,
+  getListaSubComunesConductorInspector,
 } from './FechasConductorInspector.js';
 
 /**
@@ -44,61 +44,61 @@ import {
  * }}
  */
 export function crearCalendarioBasico({ libres, subgrupo, subComunes }) {
-    const getListaLibres = (year, grupo) =>
-        getLibresConductorInspector(
-            year,
-            grupo,
-            libres.fechaInicial,
-            libres.totalSecuencia,
-            libres.secuencia,
-            libres.trabajo,
-        );
+  const getListaLibres = (year, grupo) =>
+    getLibresConductorInspector(
+      year,
+      grupo,
+      libres.fechaInicial,
+      libres.totalSecuencia,
+      libres.secuencia,
+      libres.trabajo,
+    );
 
-    const getListaSubgrupo = (year, grupo, sub) => {
-        const fechaInit = getFechaSubgrupo(subgrupo.fechasIniciales, grupo, sub);
-        const pos = subgrupo.getPosSecuencia(fechaInit);
-        return getListaSubgrupoConductorInspector(
-            year,
-            fechaInit,
-            subgrupo.totalSecuencia,
-            subgrupo.secuencia,
-            pos,
-        );
-    };
+  const getListaSubgrupo = (year, grupo, sub) => {
+    const fechaInit = getFechaSubgrupo(subgrupo.fechasIniciales, grupo, sub);
+    const pos = subgrupo.getPosSecuencia(fechaInit);
+    return getListaSubgrupoConductorInspector(
+      year,
+      fechaInit,
+      subgrupo.totalSecuencia,
+      subgrupo.secuencia,
+      pos,
+    );
+  };
 
-    const getListaSubComunes = (year, grupo, sub) => {
-        const fechaInit = getFechaSubComunes(subComunes.fechasIniciales, grupo, sub);
-        return getListaSubComunesConductorInspector(year, fechaInit, subComunes.totalSecuencia);
-    };
+  const getListaSubComunes = (year, grupo, sub) => {
+    const fechaInit = getFechaSubComunes(subComunes.fechasIniciales, grupo, sub);
+    return getListaSubComunesConductorInspector(year, fechaInit, subComunes.totalSecuencia);
+  };
 
-    return { getListaLibres, getListaSubgrupo, getListaSubComunes };
+  return { getListaLibres, getListaSubgrupo, getListaSubComunes };
 }
 
 // WHY: helper interno — busca la fecha del subgrupo en la matriz por
 //      [grupo-1][indiceLetra]. Lanza RangeError si el grupo o la letra
 //      no existen en la matriz.
 function getFechaSubgrupo(matriz, grupo, sub) {
-    if (grupo < 1 || grupo > matriz.length) {
-        throw new RangeError(`Grupo fuera de rango: ${grupo}`);
-    }
-    const fecha = matriz[grupo - 1][letraAIndice(sub)];
-    if (fecha === undefined) {
-        throw new RangeError(`Subgrupo fuera de rango: ${sub}`);
-    }
-    return fecha;
+  if (grupo < 1 || grupo > matriz.length) {
+    throw new RangeError(`Grupo fuera de rango: ${grupo}`);
+  }
+  const fecha = matriz[grupo - 1][letraAIndice(sub)];
+  if (fecha === undefined) {
+    throw new RangeError(`Subgrupo fuera de rango: ${sub}`);
+  }
+  return fecha;
 }
 
 // WHY: helper interno — la matriz subComunes solo tiene 2 columnas
 //      (ACEGI=0, BDFHJ=1). Las letras impares en orden alfabético
 //      (A,C,E,G,I) van a 0; las pares (B,D,F,H,J) a 1.
 function getFechaSubComunes(matriz, grupo, sub) {
-    if (grupo < 1 || grupo > matriz.length) {
-        throw new RangeError(`Grupo fuera de rango: ${grupo}`);
-    }
-    const pos = 'BDFHJ'.includes(sub) ? 1 : 0;
-    const fecha = matriz[grupo - 1][pos];
-    if (fecha === undefined) {
-        throw new RangeError(`Subgrupo fuera de rango: ${sub}`);
-    }
-    return fecha;
+  if (grupo < 1 || grupo > matriz.length) {
+    throw new RangeError(`Grupo fuera de rango: ${grupo}`);
+  }
+  const pos = 'BDFHJ'.includes(sub) ? 1 : 0;
+  const fecha = matriz[grupo - 1][pos];
+  if (fecha === undefined) {
+    throw new RangeError(`Subgrupo fuera de rango: ${sub}`);
+  }
+  return fecha;
 }

@@ -72,7 +72,13 @@ describe('FuncionesComunes — getListaLibres', () => {
   });
 
   it('todas las fechas devueltas están dentro del año pedido', () => {
-    const lista = getListaLibres(YEAR, new Date(YEAR - 1, 0, 1), [3, 1, 1, 1, 2, 1, 2, 1, 4], [3, 4, 3, 7, 6, 2, 4, 4, 7], 0);
+    const lista = getListaLibres(
+      YEAR,
+      new Date(YEAR - 1, 0, 1),
+      [3, 1, 1, 1, 2, 1, 2, 1, 4],
+      [3, 4, 3, 7, 6, 2, 4, 4, 7],
+      0,
+    );
     for (const d of lista) {
       expect(d.getFullYear()).toBe(YEAR);
     }
@@ -95,7 +101,9 @@ describe('FuncionesComunes — getListaSubgrupo', () => {
     const lista = getListaSubgrupo(YEAR, fechaInit, [60], 0);
     expect(lista.length).toBeGreaterThan(0);
     if (lista.length >= 2) {
-      const diasDiff = Math.round((lista[1].getTime() - lista[0].getTime()) / (1000 * 60 * 60 * 24));
+      const diasDiff = Math.round(
+        (lista[1].getTime() - lista[0].getTime()) / (1000 * 60 * 60 * 24),
+      );
       expect(diasDiff).toBe(60);
     }
   });
@@ -116,7 +124,9 @@ describe('FuncionesComunes — getListaSubgrupoReduccion', () => {
     const lista = getListaSubgrupoReduccion(YEAR, fechaInit, TOTAL);
     expect(lista.length).toBeGreaterThan(0);
     for (let i = 1; i < lista.length; i++) {
-      const diasDiff = Math.round((lista[i].getTime() - lista[i - 1].getTime()) / (1000 * 60 * 60 * 24));
+      const diasDiff = Math.round(
+        (lista[i].getTime() - lista[i - 1].getTime()) / (1000 * 60 * 60 * 24),
+      );
       expect(diasDiff).toBe(TOTAL);
     }
   });

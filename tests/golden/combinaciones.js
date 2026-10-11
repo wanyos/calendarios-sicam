@@ -23,42 +23,61 @@ const rango = (desde, hasta) => Array.from({ length: hasta - desde + 1 }, (_, i)
 const LETRAS = (n) => 'ABCDEFGHIJ'.slice(0, n).split('');
 
 function conSubgrupoLetra(tipo, grupos, numLetras) {
-    return grupos.flatMap(grupo =>
-        LETRAS(numLetras).map(subgrupo => ({ tipo, grupo, subgrupo, grupoDos: undefined })));
+  return grupos.flatMap((grupo) =>
+    LETRAS(numLetras).map((subgrupo) => ({ tipo, grupo, subgrupo, grupoDos: undefined })),
+  );
 }
 
 function sinSubgrupo(tipo, grupos) {
-    return grupos.map(grupo => ({ tipo, grupo, subgrupo: undefined, grupoDos: undefined }));
+  return grupos.map((grupo) => ({ tipo, grupo, subgrupo: undefined, grupoDos: undefined }));
 }
 
 // WHY: GruaDSM muestra 10 subgrupos por grupo: g, g+5, ..., g+45
 //      (getArrayGruaDSM en InitCabecera.js).
 function gruaDSM() {
-    return rango(1, 5).flatMap(grupo =>
-        rango(0, 9).map(i => ({ tipo: 'GruaDSM', grupo, subgrupo: String(grupo + i * 5), grupoDos: undefined })));
+  return rango(1, 5).flatMap((grupo) =>
+    rango(0, 9).map((i) => ({
+      tipo: 'GruaDSM',
+      grupo,
+      subgrupo: String(grupo + i * 5),
+      grupoDos: undefined,
+    })),
+  );
 }
 
 function refuerzoNocturno() {
-    const valores = [...NUMEROS_REFUERZO.map(String), ...LETRAS_REFUERZO];
-    return ['A', 'B'].flatMap(grupo =>
-        valores.map(grupoDos => ({ tipo: 'Refuerzo_Nocturno', grupo, subgrupo: undefined, grupoDos })));
+  const valores = [...NUMEROS_REFUERZO.map(String), ...LETRAS_REFUERZO];
+  return ['A', 'B'].flatMap((grupo) =>
+    valores.map((grupoDos) => ({
+      tipo: 'Refuerzo_Nocturno',
+      grupo,
+      subgrupo: undefined,
+      grupoDos,
+    })),
+  );
 }
 
 export const COMBINACIONES = [
-    ...conSubgrupoLetra('Conductor', rango(1, 5), 8),
-    ...conSubgrupoLetra('Inspector', rango(1, 5), 10),
-    ...conSubgrupoLetra('Inspector_Noche', rango(1, 5), 10),
-    ...conSubgrupoLetra('Grua', rango(1, 5), 3),
-    ...gruaDSM(),
-    ...sinSubgrupo('GruaDSM_Noche', rango(1, 3)),
-    ...sinSubgrupo('ParkingDSM_100', rango(1, 10)),
-    ...sinSubgrupo('ParkingDSM_50', rango(1, 12)),
-    ...refuerzoNocturno(),
-    ...conSubgrupoLetra('Buho', rango(1, 5), 8),
+  ...conSubgrupoLetra('Conductor', rango(1, 5), 8),
+  ...conSubgrupoLetra('Inspector', rango(1, 5), 10),
+  ...conSubgrupoLetra('Inspector_Noche', rango(1, 5), 10),
+  ...conSubgrupoLetra('Grua', rango(1, 5), 3),
+  ...gruaDSM(),
+  ...sinSubgrupo('GruaDSM_Noche', rango(1, 3)),
+  ...sinSubgrupo('ParkingDSM_100', rango(1, 10)),
+  ...sinSubgrupo('ParkingDSM_50', rango(1, 12)),
+  ...refuerzoNocturno(),
+  ...conSubgrupoLetra('Buho', rango(1, 5), 8),
 ];
 
 export const YEARS = rango(YEAR_DESDE, YEAR_HASTA);
 
 export const claveCombinacion = ({ tipo, grupo, subgrupo, grupoDos }) =>
-    [tipo, `g${grupo}`, subgrupo !== undefined && `s${subgrupo}`, grupoDos !== undefined && `d${grupoDos}`]
-        .filter(Boolean).join('|');
+  [
+    tipo,
+    `g${grupo}`,
+    subgrupo !== undefined && `s${subgrupo}`,
+    grupoDos !== undefined && `d${grupoDos}`,
+  ]
+    .filter(Boolean)
+    .join('|');

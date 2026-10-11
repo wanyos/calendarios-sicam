@@ -69,7 +69,10 @@ describe('FechasInspectorNoche — validación oficial calendario 2026 grupo 4',
   for (const [sub, esperadas] of Object.entries(OFICIAL_GRUPO_4)) {
     it(`subgrupo ${sub}: fechas coinciden con calendario oficial`, () => {
       const lista = getListaSubgrupoInspectorNoche(2026, 4, sub);
-      const isos = lista.map(d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`);
+      const isos = lista.map(
+        (d) =>
+          `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`,
+      );
       expect(isos).toEqual(esperadas);
     });
   }
@@ -96,7 +99,8 @@ describe('FechasInspectorNoche — BUG-01: subgrupos J grupo 4 y 5 (snapshots hi
   //      a la fecha que se pinta en el navegador, lo cual confundía al
   //      comparar contra un calendario impreso. Ahora el snapshot usa
   //      la misma fecha local que ven los usuarios.
-  const fechaLocal = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  const fechaLocal = (d) =>
+    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 
   it('grupo 4 J: snapshot completo (validado contra calendario oficial 2026)', () => {
     const lista = getListaSubgrupoInspectorNoche(YEAR, 4, 'J');

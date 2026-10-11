@@ -3,29 +3,29 @@
    ============================================================================= */
 :root {
   /* Paleta — el azul SICAM (#276cc2) es el de la web madre y el del logo. */
-  --color-brand:        #276cc2;
-  --color-brand-dark:   #1c5fa3;
-  --color-brand-light:  #4a8ed4;
-  --color-bg:           #f4f6fa;
-  --color-surface:      #ffffff;
-  --color-text:         #1a2740;
-  --color-text-muted:   #5a6378;
-  --color-border:       #dde2eb;
+  --color-brand: #276cc2;
+  --color-brand-dark: #1c5fa3;
+  --color-brand-light: #4a8ed4;
+  --color-bg: #f4f6fa;
+  --color-surface: #ffffff;
+  --color-text: #1a2740;
+  --color-text-muted: #5a6378;
+  --color-border: #dde2eb;
 
   /* WHY: estos cuatro colores son SEMÁNTICOS — el JS los aplica como clases en
      cada <td> según el tipo de día. Cambiarlos rompe la lectura del calendario. */
-  --color-libre:        #276cc2;
-  --color-subgrupo:     #1a1a1a;
-  --color-sub1:         #e4de24;
-  --color-sub2:         #259924;
+  --color-libre: #276cc2;
+  --color-subgrupo: #1a1a1a;
+  --color-sub1: #e4de24;
+  --color-sub2: #259924;
 
-  --shadow-card:  0 8px 24px -10px rgba(28, 95, 163, 0.25), 0 2px 6px -2px rgba(0, 0, 0, 0.06);
-  --shadow-soft:  0 2px 8px rgba(0, 0, 0, 0.06);
-  --shadow-hero:  0 6px 20px -6px rgba(28, 95, 163, 0.45);
+  --shadow-card: 0 8px 24px -10px rgba(28, 95, 163, 0.25), 0 2px 6px -2px rgba(0, 0, 0, 0.06);
+  --shadow-soft: 0 2px 8px rgba(0, 0, 0, 0.06);
+  --shadow-hero: 0 6px 20px -6px rgba(28, 95, 163, 0.45);
 
-  --radius-card:  16px;
+  --radius-card: 16px;
   --radius-input: 10px;
-  --radius-pill:  999px;
+  --radius-pill: 999px;
 
   --space-1: 0.25rem;
   --space-2: 0.5rem;
@@ -36,7 +36,7 @@
   --space-7: 3rem;
 
   --font-heading: 'Dosis', system-ui, -apple-system, sans-serif;
-  --font-body:    'Catamaran', system-ui, -apple-system, sans-serif;
+  --font-body: 'Catamaran', system-ui, -apple-system, sans-serif;
 
   --max-width: 1280px;
 }
@@ -89,7 +89,12 @@ button {
    Hero
    ============================================================================= */
 .hero {
-  background: linear-gradient(135deg, var(--color-brand-dark) 0%, var(--color-brand) 60%, var(--color-brand-light) 100%);
+  background: linear-gradient(
+    135deg,
+    var(--color-brand-dark) 0%,
+    var(--color-brand) 60%,
+    var(--color-brand-light) 100%
+  );
   color: white;
   box-shadow: var(--shadow-hero);
   position: relative;
@@ -229,7 +234,10 @@ button {
   border-radius: var(--radius-input);
   padding: 0.55rem 2rem 0.55rem 0.85rem;
   cursor: pointer;
-  transition: border-color 0.15s, box-shadow 0.15s, background-color 0.15s;
+  transition:
+    border-color 0.15s,
+    box-shadow 0.15s,
+    background-color 0.15s;
   min-width: 5rem;
 }
 
@@ -285,7 +293,10 @@ button {
   padding: 0.6rem 1.8rem;
   border-radius: var(--radius-pill);
   box-shadow: 0 4px 12px -4px rgba(39, 108, 194, 0.5);
-  transition: transform 0.1s, box-shadow 0.15s, background 0.15s;
+  transition:
+    transform 0.1s,
+    box-shadow 0.15s,
+    background 0.15s;
 }
 
 .btn:hover {
@@ -332,10 +343,22 @@ button {
   border-radius: var(--radius-pill);
 }
 
-.libres   { color: white; background-color: var(--color-libre); }
-.subgrupo { color: white; background-color: var(--color-subgrupo); }
-.sub1     { color: black; background-color: var(--color-sub1); }
-.sub2     { color: white; background-color: var(--color-sub2); }
+.libres {
+  color: white;
+  background-color: var(--color-libre);
+}
+.subgrupo {
+  color: white;
+  background-color: var(--color-subgrupo);
+}
+.sub1 {
+  color: black;
+  background-color: var(--color-sub1);
+}
+.sub2 {
+  color: white;
+  background-color: var(--color-sub2);
+}
 
 /* =============================================================================
    Cards de meses
@@ -397,10 +420,26 @@ table td {
 
 /* WHY: aplicamos los colores semánticos a los <td> que el JS marca con
    `.libres`, `.subgrupo`, `.sub1`, `.sub2` — manteniendo legibilidad de texto. */
-table td.libres   { background-color: var(--color-libre);    color: white; font-weight: 700; }
-table td.subgrupo { background-color: var(--color-subgrupo); color: white; font-weight: 700; }
-table td.sub1     { background-color: var(--color-sub1);     color: black; font-weight: 700; }
-table td.sub2     { background-color: var(--color-sub2);     color: white; font-weight: 700; }
+table td.libres {
+  background-color: var(--color-libre);
+  color: white;
+  font-weight: 700;
+}
+table td.subgrupo {
+  background-color: var(--color-subgrupo);
+  color: white;
+  font-weight: 700;
+}
+table td.sub1 {
+  background-color: var(--color-sub1);
+  color: black;
+  font-weight: 700;
+}
+table td.sub2 {
+  background-color: var(--color-sub2);
+  color: white;
+  font-weight: 700;
+}
 
 /* =============================================================================
    Footer
@@ -503,7 +542,9 @@ table td.sub2     { background-color: var(--color-sub2);     color: white; font-
 .ts-dropdown {
   border: 1px solid var(--color-border);
   border-radius: var(--radius-input);
-  box-shadow: 0 12px 28px -8px rgba(28, 95, 163, 0.25), 0 2px 4px rgba(0, 0, 0, 0.04);
+  box-shadow:
+    0 12px 28px -8px rgba(28, 95, 163, 0.25),
+    0 2px 4px rgba(0, 0, 0, 0.04);
   margin-top: 0.35rem;
 }
 

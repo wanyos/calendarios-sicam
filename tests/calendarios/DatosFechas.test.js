@@ -17,26 +17,32 @@ import {
 import { YEAR, expectArrayDeFechasDelAnyo } from '../helpers.js';
 
 const TODOS = [
-  'Conductor', 'Inspector', 'Inspector_Noche',
-  'Grua', 'GruaDSM', 'GruaDSM_Noche',
-  'ParkingDSM_100', 'ParkingDSM_50',
-  'Refuerzo_Nocturno', 'Buho',
+  'Conductor',
+  'Inspector',
+  'Inspector_Noche',
+  'Grua',
+  'GruaDSM',
+  'GruaDSM_Noche',
+  'ParkingDSM_100',
+  'ParkingDSM_50',
+  'Refuerzo_Nocturno',
+  'Buho',
 ];
 
 // WHY: un input "razonable" por tipo — el grupo más común y un subgrupo
 //      válido. No buscamos cubrir todas las combinaciones (eso lo hacen
 //      ya las suites por archivo); aquí solo verificamos el dispatch.
 const INPUT_POR_TIPO = {
-  Conductor:         { grupo: 1, subgrupo: 'A',  grupoDos: undefined },
-  Inspector:         { grupo: 1, subgrupo: 'A',  grupoDos: undefined },
-  Inspector_Noche:   { grupo: 1, subgrupo: 'A',  grupoDos: undefined },
-  Grua:              { grupo: 1, subgrupo: 'A',  grupoDos: undefined },
-  GruaDSM:           { grupo: 1, subgrupo: undefined, grupoDos: undefined }, // su Subgrupo recibe número
-  GruaDSM_Noche:     { grupo: 1, subgrupo: undefined, grupoDos: undefined },
-  ParkingDSM_100:    { grupo: 1, subgrupo: undefined, grupoDos: undefined },
-  ParkingDSM_50:     { grupo: 1, subgrupo: undefined, grupoDos: undefined },
+  Conductor: { grupo: 1, subgrupo: 'A', grupoDos: undefined },
+  Inspector: { grupo: 1, subgrupo: 'A', grupoDos: undefined },
+  Inspector_Noche: { grupo: 1, subgrupo: 'A', grupoDos: undefined },
+  Grua: { grupo: 1, subgrupo: 'A', grupoDos: undefined },
+  GruaDSM: { grupo: 1, subgrupo: undefined, grupoDos: undefined }, // su Subgrupo recibe número
+  GruaDSM_Noche: { grupo: 1, subgrupo: undefined, grupoDos: undefined },
+  ParkingDSM_100: { grupo: 1, subgrupo: undefined, grupoDos: undefined },
+  ParkingDSM_50: { grupo: 1, subgrupo: undefined, grupoDos: undefined },
   Refuerzo_Nocturno: { grupo: 'A', subgrupo: undefined, grupoDos: '1' },
-  Buho:              { grupo: 1, subgrupo: 'A',  grupoDos: undefined },
+  Buho: { grupo: 1, subgrupo: 'A', grupoDos: undefined },
 };
 
 describe('DatosFechas — getDatosListaLibres', () => {
@@ -58,13 +64,13 @@ describe('DatosFechas — getDatosListaSubgrupo', () => {
   //      ParkingDSM_100 y Refuerzo_Nocturno — esos solo en SubComunes
   //      o no tienen). GruaDSM espera un NÚMERO 1-50 como subgrupo.
   const conSubgrupo = {
-    Conductor:       { grupo: 1, subgrupo: 'A' },
-    Inspector:       { grupo: 1, subgrupo: 'A' },
+    Conductor: { grupo: 1, subgrupo: 'A' },
+    Inspector: { grupo: 1, subgrupo: 'A' },
     Inspector_Noche: { grupo: 1, subgrupo: 'A' },
-    Grua:            { grupo: 1, subgrupo: 'A' },
-    GruaDSM:         { grupo: 1, subgrupo: 5 },
-    ParkingDSM_50:   { grupo: 1, subgrupo: undefined },
-    Buho:            { grupo: 1, subgrupo: 'A' },
+    Grua: { grupo: 1, subgrupo: 'A' },
+    GruaDSM: { grupo: 1, subgrupo: 5 },
+    ParkingDSM_50: { grupo: 1, subgrupo: undefined },
+    Buho: { grupo: 1, subgrupo: 'A' },
   };
 
   for (const [tipo, { grupo, subgrupo }] of Object.entries(conSubgrupo)) {
@@ -89,12 +95,12 @@ describe('DatosFechas — getDatosListaSubComunes', () => {
   // WHY: tipos que tienen función de SubComunes. Grua, GruaDSM, GruaDSM_Noche
   //      y Refuerzo_Nocturno NO la tienen — devuelven undefined.
   const conSubComunes = {
-    Conductor:       { grupo: 1, subgrupo: 'A' },
-    Inspector:       { grupo: 1, subgrupo: 'A' },
+    Conductor: { grupo: 1, subgrupo: 'A' },
+    Inspector: { grupo: 1, subgrupo: 'A' },
     Inspector_Noche: { grupo: 1, subgrupo: 'A' },
-    ParkingDSM_100:  { grupo: 1, subgrupo: undefined },
-    ParkingDSM_50:   { grupo: 1, subgrupo: undefined },
-    Buho:            { grupo: 1, subgrupo: 'A' },
+    ParkingDSM_100: { grupo: 1, subgrupo: undefined },
+    ParkingDSM_50: { grupo: 1, subgrupo: undefined },
+    Buho: { grupo: 1, subgrupo: 'A' },
   };
 
   for (const [tipo, { grupo, subgrupo }] of Object.entries(conSubComunes)) {

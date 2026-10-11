@@ -96,8 +96,18 @@ describe('utils — startDay (lunes=0..domingo=6)', () => {
 describe('utils — getNombre', () => {
   it('mapea 1..12 a nombres en español', () => {
     const esperados = [
-      'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
-      'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre',
+      'Enero',
+      'Febrero',
+      'Marzo',
+      'Abril',
+      'Mayo',
+      'Junio',
+      'Julio',
+      'Agosto',
+      'Septiembre',
+      'Octubre',
+      'Noviembre',
+      'Diciembre',
     ];
     esperados.forEach((nombre, i) => {
       expect(getNombre(i + 1)).toBe(nombre);

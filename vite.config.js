@@ -1,11 +1,11 @@
-import { defineConfig } from 'vite'
-import { dirname, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { defineConfig } from 'vite';
+import { dirname, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 // WHY: en módulos ESM no existen __dirname ni __filename. Los reconstruimos
 // a partir de import.meta.url para poder resolver rutas absolutas dentro
 // del config.
-const __dirname = dirname(fileURLToPath(import.meta.url))
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig(({ mode }) => ({
   // WHY: rutas relativas en el HTML generado (./assets/...) en lugar
@@ -29,9 +29,7 @@ export default defineConfig(({ mode }) => ({
     alias: {
       '@branding': resolve(
         __dirname,
-        mode === 'whitelabel'
-          ? 'src/branding/whitelabel.js'
-          : 'src/branding/sicam.js'
+        mode === 'whitelabel' ? 'src/branding/whitelabel.js' : 'src/branding/sicam.js',
       ),
     },
   },
@@ -50,4 +48,4 @@ export default defineConfig(({ mode }) => ({
     // sabemos que es nuestra y queremos build limpio cada vez.
     emptyOutDir: true,
   },
-}))
+}));

@@ -1,26 +1,28 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es" translate="no">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/x-icon" href="./img/logo-favicon.png"/>
+    <link rel="icon" type="image/x-icon" href="./img/logo-favicon.png" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <meta name="google" value="notranslate"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="google" value="notranslate" />
 
     <!-- WHY: Dosis (titulares) + Catamaran (cuerpo) son las Google Fonts que usa sicamemt.org
          como sustitutas open-source de su DinPro propietaria. preconnect acelera la carga. -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Catamaran:wght@400;500;600;700&family=Dosis:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Catamaran:wght@400;500;600;700&family=Dosis:wght@500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
 
-    <link rel="stylesheet" href="./estilo.css"/>
+    <link rel="stylesheet" href="./estilo.css" />
     <!-- WHY: title neutro como fallback. index.js lo sobrescribe con
          branding.title al arrancar (SICAM o el white-label). -->
     <title>Calendarios</title>
   </head>
 
   <body translate="no">
-
     <!-- WHY: el logo (.hero__logo) y el eyebrow (.hero__eyebrow) los
          inyecta index.js desde @branding al arrancar. Si branding.enabled
          es false (build white-label) no se inyecta nada y queda solo
@@ -35,7 +37,6 @@
 
     <nav class="toolbar">
       <div class="toolbar__inner">
-
         <!-- WHY: select_opcion (categoría) es el filtro principal — primero a la izquierda.
              Las <option> se generan desde Constantes.js (CATEGORIAS) al cargar la página. -->
         <select id="select_opcion" class="select select--primary"></select>
@@ -63,13 +64,13 @@
             <!-- WHY: <option> generadas desde Constantes.js (NUMEROS_REFUERZO,
                  LETRAS_REFUERZO) al cargar la página. -->
             <div class="field field--radio">
-              <input class="radio" id="rdNum" type="radio" value="Num" name="opcion" checked/>
+              <input class="radio" id="rdNum" type="radio" value="Num" name="opcion" checked />
               <label for="select-num">Num</label>
               <select name="select-num" id="select-num" class="select"></select>
             </div>
 
             <div class="field field--radio">
-              <input class="radio" id="rdLtr" type="radio" value="Ltr" name="opcion"/>
+              <input class="radio" id="rdLtr" type="radio" value="Ltr" name="opcion" />
               <label for="select-ltr">Ltr</label>
               <select name="select-ltr" id="select-ltr" class="select"></select>
             </div>
@@ -77,7 +78,6 @@
         </div>
 
         <button class="btn" type="submit" name="btn" id="btn">Buscar</button>
-
       </div>
     </nav>
 

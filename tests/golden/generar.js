@@ -17,11 +17,13 @@ import { RUTA_GOLDEN, TZ_GOLDEN } from './config.js';
 
 const datos = {};
 for (const combinacion of COMBINACIONES) {
-    const porAnyo = {};
-    for (const year of YEARS) porAnyo[year] = renderAnyo(combinacion, year);
-    datos[claveCombinacion(combinacion)] = porAnyo;
+  const porAnyo = {};
+  for (const year of YEARS) porAnyo[year] = renderAnyo(combinacion, year);
+  datos[claveCombinacion(combinacion)] = porAnyo;
 }
 
 const golden = { years: YEARS, tz: TZ_GOLDEN, datos };
 writeFileSync(RUTA_GOLDEN, gzipSync(JSON.stringify(golden), { level: 9 }));
-console.log(`Golden master escrito: ${COMBINACIONES.length} combinaciones × ${YEARS.length} años → ${RUTA_GOLDEN}`);
+console.log(
+  `Golden master escrito: ${COMBINACIONES.length} combinaciones × ${YEARS.length} años → ${RUTA_GOLDEN}`,
+);
