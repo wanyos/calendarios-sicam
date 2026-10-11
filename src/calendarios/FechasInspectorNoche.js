@@ -4,7 +4,6 @@ import { crearCalendarioBasico } from './FechasFactory.js';
 //   tenían un typo (faltaba la coma del día): (2022,21) y (2022,114).
 //   Reconstruidos a (2022,1,21) y (2022,1,14) siguiendo el patrón
 //   "-1 día respecto a Inspector". Validado contra calendario impreso
-//   oficial 2026. Ver docs/REVISION_CALENDARIOS.md → BUG-01.
 const subgruposPorGrupo = [
   [
     new Date(2022, 1, 1),
